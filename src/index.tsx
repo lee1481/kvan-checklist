@@ -86,6 +86,60 @@ app.get('/', (c) => {
                 border-color: #2c5aa0;
                 box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
             }
+            
+            /* Photo button styles */
+            .photo-button {
+                width: 50px;
+                height: 50px;
+                border: 3px solid #10b981;
+                border-radius: 8px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                background: white;
+                color: #10b981;
+            }
+            
+            .photo-button.has-photo {
+                background: #10b981;
+                color: white;
+            }
+            
+            .photo-button:active {
+                transform: scale(0.95);
+            }
+            
+            /* Photo preview */
+            .photo-preview {
+                max-width: 100%;
+                max-height: 200px;
+                border-radius: 8px;
+                margin-top: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            /* Image modal */
+            .image-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                padding: 20px;
+            }
+            
+            .image-modal img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
         </style>
     </head>
     <body class="bg-gray-50">
@@ -255,6 +309,9 @@ app.get('/', (c) => {
             document.getElementById('today').textContent = new Date().toLocaleDateString('ko-KR');
             document.getElementById('installDate').valueAsDate = new Date();
 
+            // Store photos
+            const photos = {};
+
             // Render checklist sections
             const container = document.getElementById('checklist-container');
             checklistSections.forEach((section, sectionIndex) => {
@@ -264,13 +321,39 @@ app.get('/', (c) => {
                     <h2 class="text-lg font-bold text-blue-900 mb-4">\${section.title}</h2>
                     <div class="space-y-3">
                         \${section.items.map((item, itemIndex) => \`
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <span class="flex-1 text-base">\${item}</span>
-                                <div class="touch-checkbox" 
-                                    data-section="\${sectionIndex}" 
-                                    data-item="\${itemIndex}"
-                                    onclick="toggleCheck(this)">
-                                    <i class="fas fa-check text-2xl hidden"></i>
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="flex-1 text-base">\${item}</span>
+                                    <div class="flex gap-2">
+                                        <input type="file" 
+                                            id="photo-\${sectionIndex}-\${itemIndex}" 
+                                            accept="image/*" 
+                                            capture="environment"
+                                            class="hidden"
+                                            onchange="handlePhotoUpload(this, \${sectionIndex}, \${itemIndex})">
+                                        <label for="photo-\${sectionIndex}-\${itemIndex}" 
+                                            class="photo-button"
+                                            id="photo-btn-\${sectionIndex}-\${itemIndex}">
+                                            <i class="fas fa-camera text-2xl"></i>
+                                        </label>
+                                        <div class="touch-checkbox" 
+                                            data-section="\${sectionIndex}" 
+                                            data-item="\${itemIndex}"
+                                            onclick="toggleCheck(this)">
+                                            <i class="fas fa-check text-2xl hidden"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="photo-preview-\${sectionIndex}-\${itemIndex}" class="hidden">
+                                    <div class="relative inline-block">
+                                        <img class="photo-preview cursor-pointer" 
+                                            onclick="showImageModal(this.src)">
+                                        <button onclick="deletePhoto(\${sectionIndex}, \${itemIndex})"
+                                            class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition"
+                                            style="transform: translate(25%, -25%);">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         \`).join('')}
@@ -350,6 +433,104 @@ app.get('/', (c) => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             };
 
+            // Photo handling functions
+            window.handlePhotoUpload = function(input, sectionIndex, itemIndex) {
+                const file = input.files[0];
+                if (!file) return;
+
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('사진 크기는 5MB 이하여야 합니다.');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Compress and resize image
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Calculate new dimensions (max 1200px)
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDimension = 1200;
+                        
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = (height / width) * maxDimension;
+                                width = maxDimension;
+                            } else {
+                                width = (width / height) * maxDimension;
+                                height = maxDimension;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Convert to base64 with compression (0.8 quality)
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        
+                        // Store photo
+                        const photoKey = \`\${sectionIndex}-\${itemIndex}\`;
+                        photos[photoKey] = compressedDataUrl;
+                        
+                        // Update UI
+                        const previewContainer = document.getElementById(\`photo-preview-\${sectionIndex}-\${itemIndex}\`);
+                        const previewImg = previewContainer.querySelector('img');
+                        const photoBtn = document.getElementById(\`photo-btn-\${sectionIndex}-\${itemIndex}\`);
+                        
+                        previewImg.src = compressedDataUrl;
+                        previewContainer.classList.remove('hidden');
+                        photoBtn.classList.add('has-photo');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            window.deletePhoto = function(sectionIndex, itemIndex) {
+                if (!confirm('이 사진을 삭제하시겠습니까?')) return;
+                
+                const photoKey = \`\${sectionIndex}-\${itemIndex}\`;
+                delete photos[photoKey];
+                
+                // Clear file input
+                const input = document.getElementById(\`photo-\${sectionIndex}-\${itemIndex}\`);
+                input.value = '';
+                
+                // Update UI
+                const previewContainer = document.getElementById(\`photo-preview-\${sectionIndex}-\${itemIndex}\`);
+                const photoBtn = document.getElementById(\`photo-btn-\${sectionIndex}-\${itemIndex}\`);
+                
+                previewContainer.classList.add('hidden');
+                photoBtn.classList.remove('has-photo');
+            };
+
+            window.showImageModal = function(src) {
+                const modal = document.createElement('div');
+                modal.className = 'image-modal';
+                modal.innerHTML = \`
+                    <div style="position: relative; max-width: 90%; max-height: 90%;">
+                        <img src="\${src}" alt="사진 크게보기">
+                        <button onclick="this.closest('.image-modal').remove()"
+                            class="absolute top-0 right-0 bg-white text-gray-800 rounded-full w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition"
+                            style="transform: translate(50%, -50%);">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                \`;
+                modal.onclick = function(e) {
+                    if (e.target === modal) modal.remove();
+                };
+                document.body.appendChild(modal);
+            };
+
+
             // Submit checklist
             window.submitChecklist = async function() {
                 // Validate form
@@ -418,7 +599,8 @@ app.get('/', (c) => {
                         customerEmail,
                         checklist,
                         installerSignature,
-                        customerSignature
+                        customerSignature,
+                        photos: photos
                     });
 
                     if (response.data.success) {
@@ -446,20 +628,25 @@ app.post('/api/submit', async (c) => {
   try {
     const data = await c.req.json()
     
-    // TODO: Here you would:
-    // 1. Generate PDF from the data
-    // 2. Send email using Resend API or similar
-    // 3. Store data if needed
+    // Log received data (for debugging)
+    console.log('Received checklist submission')
+    console.log('Customer Email:', data.customerEmail)
+    console.log('Photos count:', Object.keys(data.photos || {}).length)
     
-    // For now, return success
-    // We'll implement email sending next
+    // TODO: Here you would:
+    // 1. Generate PDF from the data (including photos)
+    // 2. Send email using Resend API or similar
+    // 3. Store data and photos if needed (Cloudflare R2)
+    
+    // For now, return success with photo count
     return c.json({ 
       success: true, 
       message: 'Checklist submitted successfully',
       data: {
         customerEmail: data.customerEmail,
         installDate: data.installDate,
-        vehicleVin: data.vehicleVin
+        vehicleVin: data.vehicleVin,
+        photosCount: Object.keys(data.photos || {}).length
       }
     })
   } catch (error) {
