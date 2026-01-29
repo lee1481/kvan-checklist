@@ -1,7 +1,14 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { generateEmailHTML, type ChecklistData } from './email-utils'
 
-const app = new Hono()
+type Bindings = {
+  RESEND_API_KEY: string
+  FROM_EMAIL: string
+  FROM_NAME: string
+}
+
+const app = new Hono<{ Bindings: Bindings }>()
 
 // Enable CORS for API routes
 app.use('/api/*', cors())
@@ -626,34 +633,100 @@ app.get('/', (c) => {
 // API endpoint to handle form submission
 app.post('/api/submit', async (c) => {
   try {
-    const data = await c.req.json()
+    const data = await c.req.json() as ChecklistData
     
-    // Log received data (for debugging)
-    console.log('Received checklist submission')
+    console.log('📝 Received checklist submission')
     console.log('Customer Email:', data.customerEmail)
     console.log('Photos count:', Object.keys(data.photos || {}).length)
     
-    // TODO: Here you would:
-    // 1. Generate PDF from the data (including photos)
-    // 2. Send email using Resend API or similar
-    // 3. Store data and photos if needed (Cloudflare R2)
+    // Get environment variables
+    const { RESEND_API_KEY, FROM_EMAIL, FROM_NAME } = c.env
     
-    // For now, return success with photo count
-    return c.json({ 
-      success: true, 
-      message: 'Checklist submitted successfully',
-      data: {
-        customerEmail: data.customerEmail,
-        installDate: data.installDate,
-        vehicleVin: data.vehicleVin,
-        photosCount: Object.keys(data.photos || {}).length
+    // Check if API key is configured
+    if (!RESEND_API_KEY || RESEND_API_KEY === 'your_resend_api_key_here') {
+      console.warn('⚠️  Resend API key not configured')
+      return c.json({ 
+        success: false, 
+        error: 'Email service not configured. Please set RESEND_API_KEY in environment variables.',
+        debug: {
+          message: 'API key missing or using default value',
+          photosCount: Object.keys(data.photos || {}).length,
+          customerEmail: data.customerEmail,
+          hint: 'Get your API key from https://resend.com and add it to .dev.vars or wrangler secrets'
+        }
+      }, 503)
+    }
+    
+    try {
+      // Generate HTML email with embedded photos
+      console.log('📧 Generating email HTML with photos...')
+      const emailHTML = generateEmailHTML(data)
+      console.log('✅ Email HTML generated')
+      
+      // Send email using Resend REST API
+      console.log('📤 Sending email via Resend REST API...')
+      
+      const fromName = FROM_NAME || '케이밴 경북지사'
+      const fromEmail = FROM_EMAIL || 'noreply@yourdomain.com'
+      const emailSubject = '케이밴 제품 시공 점검표 - ' + data.vehicleVin
+      
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + RESEND_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: fromName + ' <' + fromEmail + '>',
+          to: [data.customerEmail],
+          subject: emailSubject,
+          html: emailHTML
+        })
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error('Resend API error: ' + JSON.stringify(errorData))
       }
-    })
-  } catch (error) {
-    console.error('Submit error:', error)
+      
+      const emailResponse = await response.json()
+      console.log('✅ Email sent successfully:', emailResponse)
+      
+      return c.json({ 
+        success: true, 
+        message: 'Checklist submitted and email sent successfully',
+        data: {
+          customerEmail: data.customerEmail,
+          installDate: data.installDate,
+          vehicleVin: data.vehicleVin,
+          photosCount: Object.keys(data.photos || {}).length,
+          emailId: emailResponse.id
+        }
+      })
+      
+    } catch (emailError: any) {
+      console.error('❌ Email sending error:', emailError)
+      
+      // Return detailed error for debugging
+      return c.json({ 
+        success: false, 
+        error: 'Failed to send email',
+        details: emailError.message || 'Unknown email error',
+        debug: {
+          apiKeyExists: !!RESEND_API_KEY,
+          apiKeyValid: RESEND_API_KEY !== 'your_resend_api_key_here',
+          fromEmail: FROM_EMAIL,
+          toEmail: data.customerEmail
+        }
+      }, 500)
+    }
+    
+  } catch (error: any) {
+    console.error('❌ Submit error:', error)
     return c.json({ 
       success: false, 
-      error: error.message || 'Failed to submit checklist' 
+      error: error.message || 'Failed to submit checklist',
+      stack: error.stack
     }, 500)
   }
 })
