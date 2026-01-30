@@ -571,15 +571,34 @@ app.get('/', (c) => {
                     checklist[section][item] = cb.classList.contains('checked');
                 });
 
-                // Get signatures
-                const installerSignature = canvases.installer.toDataURL();
-                const customerSignature = canvases.customer.toDataURL();
+                // Get signatures (PNG format with transparency)
+                const installerSignature = canvases.installer.toDataURL('image/png');
+                const customerSignature = canvases.customer.toDataURL('image/png');
+                
+                console.log('📝 서명 데이터 크기:', {
+                    installer: installerSignature.length,
+                    customer: customerSignature.length
+                });
 
-                // Check if signatures are empty
+                // Check if signatures are empty (improved detection)
                 const isSignatureEmpty = (canvas) => {
                     const ctx = canvas.getContext('2d');
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                    return !imageData.some(channel => channel !== 0);
+                    
+                    // Check if there are any non-white pixels (drawing exists)
+                    for (let i = 0; i < imageData.length; i += 4) {
+                        const r = imageData[i];
+                        const g = imageData[i + 1];
+                        const b = imageData[i + 2];
+                        const a = imageData[i + 3];
+                        
+                        // If pixel is not white and not transparent, signature exists
+                        if ((r < 250 || g < 250 || b < 250) && a > 0) {
+                            return false; // Signature exists!
+                        }
+                    }
+                    
+                    return true; // No signature found
                 };
 
                 if (isSignatureEmpty(canvases.installer)) {
@@ -591,6 +610,14 @@ app.get('/', (c) => {
                     alert('고객 서명을 해주세요.');
                     return;
                 }
+
+                // Debug log
+                console.log('📤 제출 데이터:', {
+                    사진개수: Object.keys(photos).length,
+                    사진키목록: Object.keys(photos),
+                    시공자서명길이: installerSignature.length,
+                    고객서명길이: customerSignature.length
+                });
 
                 // Show loading
                 document.getElementById('loadingOverlay').classList.remove('hidden');
@@ -638,6 +665,9 @@ app.post('/api/submit', async (c) => {
     console.log('📝 Received checklist submission')
     console.log('Customer Email:', data.customerEmail)
     console.log('Photos count:', Object.keys(data.photos || {}).length)
+    console.log('Photos keys:', Object.keys(data.photos || {}))
+    console.log('Installer signature length:', data.installerSignature?.length || 0)
+    console.log('Customer signature length:', data.customerSignature?.length || 0)
     
     // Get environment variables
     const { RESEND_API_KEY, FROM_EMAIL, FROM_NAME } = c.env
