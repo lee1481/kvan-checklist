@@ -6,6 +6,7 @@ export interface ChecklistData {
   installerName: string
   customerName: string
   customerEmail: string
+  emailList: string[]
   checklist: Record<string, Record<string, boolean>>
   installerSignature: string
   customerSignature: string

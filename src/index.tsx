@@ -296,10 +296,22 @@ app.get('/', (c) => {
                             placeholder="고객 이름" required>
                     </div>
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-                        <input type="email" id="customerEmail" 
+                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 1 (필수)</label>
+                        <input type="email" id="customerEmail1" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
                             placeholder="example@email.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 2 (선택)</label>
+                        <input type="email" id="customerEmail2" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="example@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 3 (선택)</label>
+                        <input type="email" id="customerEmail3" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="example@email.com">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">서명</label>
@@ -319,7 +331,7 @@ app.get('/', (c) => {
                 <p class="text-sm text-yellow-800">
                     <i class="fas fa-exclamation-triangle mr-2"></i>
                     <strong>안내:</strong> 모든 항목을 확인하고 서명 후 완료 버튼을 눌러주세요. 
-                    입력하신 이메일로 점검표가 자동 발송됩니다.
+                    입력하신 이메일로 점검표가 자동 발송됩니다. (최대 3개 이메일 동시 발송 가능)
                 </p>
             </div>
 
@@ -650,19 +662,29 @@ app.get('/', (c) => {
                 
                 const installerName = document.getElementById('installerName').value;
                 const customerName = document.getElementById('customerName').value;
-                const customerEmail = document.getElementById('customerEmail').value;
+                
+                // Collect email addresses
+                const customerEmail1 = document.getElementById('customerEmail1').value.trim();
+                const customerEmail2 = document.getElementById('customerEmail2').value.trim();
+                const customerEmail3 = document.getElementById('customerEmail3').value.trim();
+                
+                // Collect all valid emails
+                const emailList = [customerEmail1, customerEmail2, customerEmail3].filter(e => e);
+                const customerEmail = customerEmail1; // Primary email for backward compatibility
 
                 if (!installDate || !vehicleVin || !productName || 
-                    !installerName || !customerName || !customerEmail) {
+                    !installerName || !customerName || !customerEmail1) {
                     alert('모든 필수 항목을 입력해주세요.\\n제품 시공명은 최소 1개 이상 선택해야 합니다.');
                     return;
                 }
 
-                // Validate email
+                // Validate all email addresses
                 const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
-                if (!emailRegex.test(customerEmail)) {
-                    alert('올바른 이메일 주소를 입력해주세요.');
-                    return;
+                for (const email of emailList) {
+                    if (!emailRegex.test(email)) {
+                        alert(\`올바른 이메일 주소를 입력해주세요: \${email}\`);
+                        return;
+                    }
                 }
 
                 // Collect checklist data
@@ -730,7 +752,8 @@ app.get('/', (c) => {
                     사진개수: totalPhotoCount,
                     섹션별사진: Object.keys(photos).map(k => \`\${k}: \${photos[k]?.length || 0}장\`),
                     시공자서명길이: installerSignature.length,
-                    고객서명길이: customerSignature.length
+                    고객서명길이: customerSignature.length,
+                    이메일개수: emailList.length
                 });
 
                 // Show loading
@@ -745,6 +768,7 @@ app.get('/', (c) => {
                         installerName,
                         customerName,
                         customerEmail,
+                        emailList,
                         checklist,
                         installerSignature,
                         customerSignature,
@@ -752,7 +776,7 @@ app.get('/', (c) => {
                     });
 
                     if (response.data.success) {
-                        alert('✅ 점검표가 성공적으로 제출되었습니다!\\n이메일이 발송되었습니다.');
+                        alert(\`✅ 점검표가 성공적으로 제출되었습니다!\\n\${emailList.length}개 이메일로 발송되었습니다.\`);
                         // Optionally redirect or reset form
                         window.location.reload();
                     } else {
@@ -777,7 +801,8 @@ app.post('/api/submit', async (c) => {
     const data = await c.req.json() as ChecklistData
     
     console.log('📝 Received checklist submission')
-    console.log('Customer Email:', data.customerEmail)
+    console.log('Email List:', data.emailList)
+    console.log('Email Count:', data.emailList?.length || 0)
     console.log('Photos count:', Object.keys(data.photos || {}).length)
     console.log('Photos keys:', Object.keys(data.photos || {}))
     console.log('Installer signature length:', data.installerSignature?.length || 0)
@@ -860,7 +885,7 @@ app.post('/api/submit', async (c) => {
       
       const emailPayload: any = {
         from: fromName + ' <' + fromEmail + '>',
-        to: [data.customerEmail],
+        to: data.emailList || [data.customerEmail],
         subject: emailSubject,
         html: emailHTML
       }
@@ -891,7 +916,8 @@ app.post('/api/submit', async (c) => {
         success: true, 
         message: 'Checklist submitted and email sent successfully',
         data: {
-          customerEmail: data.customerEmail,
+          emailList: data.emailList || [data.customerEmail],
+          emailCount: data.emailList?.length || 1,
           installDate: data.installDate,
           vehicleVin: data.vehicleVin,
           photosCount: Object.keys(data.photos || {}).length,
@@ -911,7 +937,7 @@ app.post('/api/submit', async (c) => {
           apiKeyExists: !!RESEND_API_KEY,
           apiKeyValid: RESEND_API_KEY !== 'your_resend_api_key_here',
           fromEmail: FROM_EMAIL,
-          toEmail: data.customerEmail
+          toEmails: data.emailList || [data.customerEmail]
         }
       }, 500)
     }
