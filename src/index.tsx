@@ -784,7 +784,19 @@ app.get('/', (c) => {
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('❌ 제출 중 오류가 발생했습니다.\\n' + (error.response?.data?.error || error.message));
+                    const errorData = error.response?.data;
+                    let errorMessage = '❌ 제출 중 오류가 발생했습니다.\\n\\n';
+                    
+                    if (errorData) {
+                        errorMessage += errorData.error || error.message;
+                        if (errorData.hint) {
+                            errorMessage += '\\n\\n💡 ' + errorData.hint;
+                        }
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    
+                    alert(errorMessage);
                 } finally {
                     document.getElementById('loadingOverlay').classList.add('hidden');
                 }
@@ -928,16 +940,26 @@ app.post('/api/submit', async (c) => {
     } catch (emailError: any) {
       console.error('❌ Email sending error:', emailError)
       
+      // Check if this is a Resend validation error
+      const errorMessage = emailError.message || 'Unknown email error'
+      const isResendValidationError = errorMessage.includes('You can only send testing emails')
+      
       // Return detailed error for debugging
       return c.json({ 
         success: false, 
-        error: 'Failed to send email',
-        details: emailError.message || 'Unknown email error',
+        error: isResendValidationError 
+          ? '⚠️ Resend 테스트 모드 제한: 본인 이메일(designsoul2007@gmail.com)로만 전송 가능합니다. 다른 이메일로 전송하려면 도메인 인증이 필요합니다.'
+          : 'Failed to send email',
+        details: errorMessage,
+        hint: isResendValidationError 
+          ? '프로덕션 배포 시 https://resend.com/domains 에서 도메인을 인증하세요.'
+          : undefined,
         debug: {
           apiKeyExists: !!RESEND_API_KEY,
           apiKeyValid: RESEND_API_KEY !== 'your_resend_api_key_here',
           fromEmail: FROM_EMAIL,
-          toEmails: data.emailList || [data.customerEmail]
+          toEmails: data.emailList || [data.customerEmail],
+          isTestMode: isResendValidationError
         }
       }, 500)
     }
