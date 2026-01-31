@@ -1045,7 +1045,7 @@ app.get('/', (c) => {
                 console.log('✅ validateForm 통과, PDF 생성 시작');
                 
                 // PDF 생성
-                await generatePDF();
+                await window.generatePDF();
             };
 
 
