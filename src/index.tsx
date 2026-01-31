@@ -514,8 +514,10 @@ app.get('/', (c) => {
                 const startDrawing = (e) => {
                     isDrawing[type] = true;
                     const rect = canvas.getBoundingClientRect();
-                    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-                    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    const x = ((e.clientX || e.touches[0].clientX) - rect.left) * scaleX;
+                    const y = ((e.clientY || e.touches[0].clientY) - rect.top) * scaleY;
                     ctx.beginPath();
                     ctx.moveTo(x, y);
                 };
@@ -524,8 +526,10 @@ app.get('/', (c) => {
                     if (!isDrawing[type]) return;
                     e.preventDefault();
                     const rect = canvas.getBoundingClientRect();
-                    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-                    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    const x = ((e.clientX || e.touches[0].clientX) - rect.left) * scaleX;
+                    const y = ((e.clientY || e.touches[0].clientY) - rect.top) * scaleY;
                     ctx.lineTo(x, y);
                     ctx.stroke();
                 };
