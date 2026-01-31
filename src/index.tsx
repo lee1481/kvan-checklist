@@ -816,15 +816,16 @@ app.get('/', (c) => {
                     
                     console.log('✅ PDF HTML 생성 완료');
                     
-                    // 임시 DIV 생성
+                    // 임시 DIV 생성 (화면에 보이게 렌더링)
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = pdfHTML;
-                    tempDiv.style.position = 'absolute';
-                    tempDiv.style.left = '-9999px';
+                    tempDiv.style.position = 'fixed';
+                    tempDiv.style.left = '0';
                     tempDiv.style.top = '0';
                     tempDiv.style.width = '210mm';
                     tempDiv.style.background = 'white';
-                    tempDiv.style.visibility = 'hidden';
+                    tempDiv.style.zIndex = '10000';
+                    tempDiv.style.pointerEvents = 'none';
                     document.body.appendChild(tempDiv);
                     
                     console.log('📸 html2canvas 캡처 시작...');
@@ -874,6 +875,9 @@ app.get('/', (c) => {
                     }
                     
                     console.log('✅ PDF 생성 완료');
+                    
+                    // 임시 DIV 제거
+                    document.body.removeChild(tempDiv);
                     
                     // PDF 저장
                     const filename = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.pdf';
