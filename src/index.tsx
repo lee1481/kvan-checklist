@@ -890,8 +890,13 @@ app.get('/', (c) => {
 
             // 📧 이메일 발송 버튼
             window.submitEmail = async function() {
+                console.log('✅ submitEmail 함수 호출됨');
                 const formData = validateForm();
-                if (!formData) return;
+                if (!formData) {
+                    console.log('❌ validateForm 실패');
+                    return;
+                }
+                console.log('✅ validateForm 통과:', formData);
                 
                 // Collect email addresses
                 const customerEmail2 = document.getElementById('customerEmail2').value.trim();
@@ -984,8 +989,13 @@ app.get('/', (c) => {
 
             // 📄 PDF 다운로드 버튼
             window.downloadPDF = async function() {
+                console.log('✅ downloadPDF 함수 호출됨');
                 const formData = validateForm();
-                if (!formData) return;
+                if (!formData) {
+                    console.log('❌ validateForm 실패');
+                    return;
+                }
+                console.log('✅ validateForm 통과, PDF 생성 시작');
                 
                 // PDF 생성
                 await generatePDF();
