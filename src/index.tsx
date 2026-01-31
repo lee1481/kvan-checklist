@@ -24,7 +24,8 @@ app.get('/', (c) => {
         <title>케이밴 제품 시공 점검표</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
         <style>
             body {
                 font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
@@ -668,7 +669,7 @@ app.get('/', (c) => {
             };
 
 
-            // PDF 생성 함수
+            // PDF 생성 함수 (jsPDF + html2canvas 직접 사용)
             window.generatePDF = async function() {
                 console.log('🚀 PDF 생성 시작!');
                 try {
@@ -676,29 +677,71 @@ app.get('/', (c) => {
                     document.getElementById('loadingOverlay').classList.remove('hidden');
                     console.log('⏳ 로딩 오버레이 표시');
                     
-                    // PDF 생성할 컨텐츠 준비
+                    // 데이터 수집
                     const installDate = document.getElementById('installDate').value;
                     const vehicleVin = document.getElementById('vehicleVin').value;
-                    console.log('📅 시공일자:', installDate);
-                    console.log('🚗 차대번호:', vehicleVin);
                     const selectedProducts = [];
                     document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
                         selectedProducts.push(cb.value);
                     });
                     const otherCheckbox = document.getElementById('otherProductCheckbox');
                     const otherInput = document.getElementById('otherProductInput');
-                    if (otherCheckbox.checked && otherInput.value.trim()) {
+                    if (otherCheckbox && otherCheckbox.checked && otherInput && otherInput.value.trim()) {
                         selectedProducts.push(otherInput.value.trim());
                     }
                     const productName = selectedProducts.join(', ');
                     const installerName = document.getElementById('installerName').value;
                     const customerName = document.getElementById('customerName').value;
-                    console.log('📦 제품명:', productName);
-                    console.log('👷 시공자:', installerName);
-                    console.log('👤 고객명:', customerName);
                     
-                    // 체크리스트 데이터 수집
-                    let checklistHTML = '';
+                    console.log('📊 수집된 데이터:', { installDate, vehicleVin, productName, installerName, customerName });
+                    
+                    // jsPDF 초기화
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    let yPosition = 20;
+                    
+                    console.log('📄 PDF 객체 생성 완료:', pageWidth, 'x', pageHeight);
+                    
+                    // 제목
+                    pdf.setFontSize(20);
+                    pdf.setTextColor(44, 90, 160);
+                    pdf.text('케이밴 제품 시공 점검표', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 10;
+                    
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('Installation Checklist', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 15;
+                    
+                    // 시공 정보
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(44, 90, 160);
+                    pdf.text('시공 정보', 15, yPosition);
+                    yPosition += 8;
+                    
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(0, 0, 0);
+                    pdf.text(\`시공일자: \${installDate}\`, 20, yPosition);
+                    yPosition += 7;
+                    pdf.text(\`차대번호: \${vehicleVin}\`, 20, yPosition);
+                    yPosition += 7;
+                    pdf.text(\`제품명: \${productName}\`, 20, yPosition);
+                    yPosition += 7;
+                    pdf.text(\`시공자: \${installerName}\`, 20, yPosition);
+                    yPosition += 7;
+                    pdf.text(\`고객명: \${customerName}\`, 20, yPosition);
+                    yPosition += 15;
+                    
+                    console.log('✅ 시공 정보 작성 완료');
+                    
+                    // 체크리스트
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(44, 90, 160);
+                    pdf.text('점검 항목', 15, yPosition);
+                    yPosition += 8;
+                    
                     const sections = [
                         { title: '차바닥 (태고합판, 알루미늄체크판, 부자재)', items: ['외관, 표면', '고정볼트', '테두리고정 및 마감', '소음'] },
                         { title: '격벽타공판', items: ['외관, 표면, 도장, 로고', '고정볼트', '테두리고정 및 마감'] },
@@ -708,179 +751,79 @@ app.get('/', (c) => {
                         { title: '워크스페이스 (휠 우측)', items: ['프레임 및 트레이 외관', '선반높이, 수평', '프레임 상·하단 볼트 고정', '소음'] }
                     ];
                     
+                    pdf.setFontSize(9);
                     sections.forEach((section, sectionIndex) => {
-                        checklistHTML += \`<div style="margin-bottom: 20px; page-break-inside: avoid;">
-                            <h3 style="background: #2c5aa0; color: white; padding: 10px; margin: 0; font-size: 16px;">\${section.title}</h3>
-                            <table style="width: 100%; border-collapse: collapse;">
-                        \`;
+                        // 페이지 넘김 확인
+                        if (yPosition > pageHeight - 40) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
                         
+                        // 섹션 제목
+                        pdf.setFillColor(44, 90, 160);
+                        pdf.rect(15, yPosition - 5, pageWidth - 30, 7, 'F');
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.text(section.title, 17, yPosition);
+                        yPosition += 8;
+                        
+                        // 항목들
+                        pdf.setTextColor(0, 0, 0);
                         section.items.forEach((item, itemIndex) => {
                             const checkbox = document.querySelector(\`[data-section="\${sectionIndex}"][data-item="\${itemIndex}"]\`);
                             const isChecked = checkbox && checkbox.classList.contains('checked');
-                            checklistHTML += \`
-                                <tr>
-                                    <td style="border: 1px solid #ddd; padding: 12px; width: 70%;">\${item}</td>
-                                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 20px;">
-                                        \${isChecked ? '✅' : '⬜'}
-                                    </td>
-                                </tr>
-                            \`;
+                            
+                            pdf.text(item, 20, yPosition);
+                            pdf.text(isChecked ? '✓' : '□', pageWidth - 25, yPosition);
+                            yPosition += 6;
                         });
                         
-                        checklistHTML += '</table></div>';
+                        yPosition += 5;
                     });
                     
-                    // 사진 데이터 수집
-                    console.log('📸 사진 수집 시작...');
-                    let photosHTML = '';
-                    const photoSections = Object.keys(window.photos);
-                    console.log('📸 사진 섹션 개수:', photoSections.length);
-                    if (photoSections.length > 0) {
-                        photosHTML = '<div style="page-break-before: always;"><h3 style="background: #2c5aa0; color: white; padding: 10px; margin: 20px 0 10px 0;">📸 첨부 사진</h3>';
-                        photoSections.forEach(sectionKey => {
-                            const sectionPhotos = window.photos[sectionKey];
-                            if (sectionPhotos && sectionPhotos.length > 0) {
-                                const sectionIndex = parseInt(sectionKey.replace('section-', ''));
-                                const sectionTitle = sections[sectionIndex]?.title || '섹션 ' + (sectionIndex + 1);
-                                photosHTML += \`<div style="margin-bottom: 20px;">
-                                    <h4 style="color: #2c5aa0; margin: 10px 0;">\${sectionTitle}</h4>
-                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                                \`;
-                                sectionPhotos.forEach(photo => {
-                                    photosHTML += \`<img src="\${photo.data}" style="width: 100%; height: 200px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" />\`;
-                                });
-                                photosHTML += '</div></div>';
-                            }
-                        });
-                        photosHTML += '</div>';
+                    console.log('✅ 체크리스트 작성 완료');
+                    
+                    // 서명
+                    if (yPosition > pageHeight - 80) {
+                        pdf.addPage();
+                        yPosition = 20;
                     }
                     
-                    // 서명 이미지
-                    console.log('✍️  서명 데이터 추출 시작...');
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(44, 90, 160);
+                    pdf.text('서명', 15, yPosition);
+                    yPosition += 10;
+                    
+                    // 시공자 서명
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(0, 0, 0);
+                    pdf.text(\`시공자: \${installerName}\`, 20, yPosition);
+                    yPosition += 7;
+                    
                     const installerSig = canvases.installer.toDataURL('image/png');
-                    const customerSig = canvases.customer.toDataURL('image/png');
-                    console.log('✍️  시공자 서명 길이:', installerSig.length);
-                    console.log('✍️  고객 서명 길이:', customerSig.length);
-                    
-                    console.log('📄 PDF 컨텐츠 생성 시작...');
-                    // PDF 컨텐츠 생성
-                    const pdfContent = \`
-                        <div style="font-family: 'Malgun Gothic', Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
-                            <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2c5aa0; padding-bottom: 20px;">
-                                <h1 style="color: #2c5aa0; margin: 0; font-size: 28px;">케이밴 제품 시공 점검표</h1>
-                                <p style="color: #666; margin-top: 10px;">Installation Checklist</p>
-                            </div>
-                            
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                                <h2 style="color: #2c5aa0; margin-top: 0; font-size: 18px; border-bottom: 2px solid #2c5aa0; padding-bottom: 8px;">시공 정보</h2>
-                                <table style="width: 100%; margin-top: 15px;">
-                                    <tr>
-                                        <td style="padding: 8px 0; font-weight: bold; width: 30%;">시공일자:</td>
-                                        <td style="padding: 8px 0;">\${installDate}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; font-weight: bold;">차대번호:</td>
-                                        <td style="padding: 8px 0;">\${vehicleVin}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; font-weight: bold;">제품명:</td>
-                                        <td style="padding: 8px 0;">\${productName}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; font-weight: bold;">시공자:</td>
-                                        <td style="padding: 8px 0;">\${installerName}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0; font-weight: bold;">고객명:</td>
-                                        <td style="padding: 8px 0;">\${customerName}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <div style="margin-bottom: 30px;">
-                                <h2 style="color: #2c5aa0; font-size: 18px; border-bottom: 2px solid #2c5aa0; padding-bottom: 8px;">점검 항목</h2>
-                                \${checklistHTML}
-                            </div>
-                            
-                            \${photosHTML}
-                            
-                            <div style="margin-top: 30px; page-break-inside: avoid;">
-                                <h2 style="color: #2c5aa0; font-size: 18px; border-bottom: 2px solid #2c5aa0; padding-bottom: 8px;">서명</h2>
-                                <table style="width: 100%; margin-top: 20px;">
-                                    <tr>
-                                        <td style="width: 50%; padding: 10px; vertical-align: top;">
-                                            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 4px; background: #f8f9fa;">
-                                                <p style="font-weight: bold; margin: 0 0 10px 0;">시공자</p>
-                                                <p style="margin: 5px 0;">이름: \${installerName}</p>
-                                                <div style="margin-top: 10px; background: white; border: 1px solid #ddd; height: 120px; display: flex; align-items: center; justify-content: center;">
-                                                    <img src="\${installerSig}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td style="width: 50%; padding: 10px; vertical-align: top;">
-                                            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 4px; background: #f8f9fa;">
-                                                <p style="font-weight: bold; margin: 0 0 10px 0;">고객</p>
-                                                <p style="margin: 5px 0;">이름: \${customerName}</p>
-                                                <div style="margin-top: 10px; background: white; border: 1px solid #ddd; height: 120px; display: flex; align-items: center; justify-content: center;">
-                                                    <img src="\${customerSig}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
-                                <p>케이밴 경북지사</p>
-                                <p style="margin-top: 5px;">본 점검표는 시공 품질 확보 및 고객 만족도 향상을 위해 작성되었습니다.</p>
-                            </div>
-                        </div>
-                    \`;
-                    
-                    console.log('📄 PDF 컨텐츠 길이:', pdfContent.length);
-                    
-                    // 임시 div 생성 (화면에 보이도록 설정)
-                    console.log('🔧 임시 DOM 요소 생성...');
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = pdfContent;
-                    // 화면 상단에 표시 (html2canvas가 렌더링할 수 있도록)
-                    tempDiv.style.position = 'fixed';
-                    tempDiv.style.top = '0';
-                    tempDiv.style.left = '0';
-                    tempDiv.style.width = '210mm'; // A4 너비
-                    tempDiv.style.zIndex = '-1'; // 다른 요소 뒤에 표시
-                    tempDiv.style.opacity = '0'; // 투명하게 (보이지 않지만 렌더링은 됨)
-                    document.body.appendChild(tempDiv);
-                    console.log('✅ 임시 DOM 요소 추가 완료');
-                    
-                    // html2pdf 존재 확인
-                    if (typeof html2pdf === 'undefined') {
-                        throw new Error('html2pdf 라이브러리가 로드되지 않았습니다!');
+                    if (installerSig && installerSig.length > 100) {
+                        pdf.addImage(installerSig, 'PNG', 20, yPosition, 70, 30);
                     }
-                    console.log('✅ html2pdf 라이브러리 확인 완료');
+                    yPosition += 35;
                     
-                    // PDF 생성 옵션
-                    const opt = {
-                        margin: [10, 10, 10, 10],
-                        filename: \`케이밴_점검표_\${vehicleVin}_\${installDate}.pdf\`,
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2, useCORS: true, logging: false },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    };
-                    console.log('📋 PDF 옵션:', opt);
+                    // 고객 서명
+                    pdf.text(\`고객: \${customerName}\`, 20, yPosition);
+                    yPosition += 7;
                     
-                    // PDF 생성
-                    console.log('🚀 html2pdf 호출 시작...');
-                    await html2pdf().set(opt).from(tempDiv).save();
-                    console.log('✅ PDF 생성 완료!');
+                    const customerSig = canvases.customer.toDataURL('image/png');
+                    if (customerSig && customerSig.length > 100) {
+                        pdf.addImage(customerSig, 'PNG', 20, yPosition, 70, 30);
+                    }
                     
-                    // 임시 div 제거
-                    document.body.removeChild(tempDiv);
+                    console.log('✅ 서명 추가 완료');
+                    
+                    // PDF 저장
+                    pdf.save(\`케이밴_점검표_\${vehicleVin}_\${installDate}.pdf\`);
+                    
+                    console.log('✅ PDF 다운로드 완료!');
                     
                     // 로딩 숨김
                     document.getElementById('loadingOverlay').classList.add('hidden');
                     
-                    console.log('✅ PDF 다운로드 완료');
                 } catch (error) {
                     console.error('❌ PDF 생성 오류:', error);
                     console.error('❌ 에러 스택:', error.stack);
