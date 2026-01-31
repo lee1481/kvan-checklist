@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { generateEmailHTML, type ChecklistData } from './email-utils'
+import { generateEmailHTML, generateEmailHTMLWithCID, type ChecklistData } from './email-utils'
 
 type Bindings = {
   RESEND_API_KEY: string
@@ -688,10 +688,54 @@ app.post('/api/submit', async (c) => {
     }
     
     try {
-      // Generate HTML email with embedded photos
+      // Generate HTML email with CID references for photos
       console.log('📧 Generating email HTML with photos...')
-      const emailHTML = generateEmailHTML(data)
-      console.log('✅ Email HTML generated')
+      
+      // Prepare attachments array for Resend
+      const attachments: any[] = []
+      
+      // Add photos as attachments with CID (Content-ID)
+      Object.entries(data.photos || {}).forEach(([key, base64Data]) => {
+        // Extract base64 data without the data URL prefix
+        const matches = base64Data.match(/^data:([^;]+);base64,(.+)$/)
+        if (matches) {
+          const mimeType = matches[1]
+          const content = matches[2]
+          const extension = mimeType.split('/')[1] || 'jpg'
+          
+          attachments.push({
+            filename: `photo_${key}.${extension}`,
+            content: content,
+            content_id: `photo_${key}`,
+            disposition: 'inline'
+          })
+        }
+      })
+      
+      // Add signatures as inline attachments
+      const installerSigMatch = data.installerSignature.match(/^data:([^;]+);base64,(.+)$/)
+      if (installerSigMatch) {
+        attachments.push({
+          filename: 'installer_signature.png',
+          content: installerSigMatch[2],
+          content_id: 'installer_signature',
+          disposition: 'inline'
+        })
+      }
+      
+      const customerSigMatch = data.customerSignature.match(/^data:([^;]+);base64,(.+)$/)
+      if (customerSigMatch) {
+        attachments.push({
+          filename: 'customer_signature.png',
+          content: customerSigMatch[2],
+          content_id: 'customer_signature',
+          disposition: 'inline'
+        })
+      }
+      
+      // Generate email HTML with CID references instead of base64
+      const emailHTML = generateEmailHTMLWithCID(data)
+      console.log('✅ Email HTML generated with', attachments.length, 'attachments')
       
       // Send email using Resend REST API
       console.log('📤 Sending email via Resend REST API...')
@@ -700,18 +744,25 @@ app.post('/api/submit', async (c) => {
       const fromEmail = FROM_EMAIL || 'noreply@yourdomain.com'
       const emailSubject = '케이밴 제품 시공 점검표 - ' + data.vehicleVin
       
+      const emailPayload: any = {
+        from: fromName + ' <' + fromEmail + '>',
+        to: [data.customerEmail],
+        subject: emailSubject,
+        html: emailHTML
+      }
+      
+      // Add attachments if any
+      if (attachments.length > 0) {
+        emailPayload.attachments = attachments
+      }
+      
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + RESEND_API_KEY,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          from: fromName + ' <' + fromEmail + '>',
-          to: [data.customerEmail],
-          subject: emailSubject,
-          html: emailHTML
-        })
+        body: JSON.stringify(emailPayload)
       })
       
       if (!response.ok) {
