@@ -183,46 +183,61 @@ app.get('/', (c) => {
                             placeholder="차대번호를 입력하세요" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">제품 시공명</label>
-                        <input type="text" id="productName" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="예: 케이밴 풀 패키지" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">제품 구성 (해당 항목 체크)</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 스마트패키지">
-                                <span class="text-base">기아PV5 스마트패키지</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 워크스테이션">
-                                <span class="text-base">기아PV5 워크스테이션</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 기아 3단부품선반">
-                                <span class="text-base">PV5 기아 3단부품선반</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 기아 3단선반">
-                                <span class="text-base">PV5 기아 3단선반</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 스마트에디션">
-                                <span class="text-base">PV5 밀워키 스마트에디션</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 워크스테이션">
-                                <span class="text-base">PV5 밀워키 워크스테이션</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 3단부품선반">
-                                <span class="text-base">PV5 밀워키 3단부품선반</span>
-                            </label>
-                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 3단선반">
-                                <span class="text-base">PV5 밀워키 3단선반</span>
-                            </label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">제품 시공명 (해당 항목 체크)</label>
+                        
+                        <!-- 좌우 2단 레이아웃 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- 기아PV5 -->
+                            <div class="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
+                                <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+                                    <i class="fas fa-car mr-2"></i>
+                                    기아PV5
+                                </h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 스마트패키지">
+                                        <span class="text-base">스마트패키지</span>
+                                    </label>
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 워크스테이션">
+                                        <span class="text-base">워크스테이션</span>
+                                    </label>
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 3단부품선반">
+                                        <span class="text-base">3단부품선반</span>
+                                    </label>
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 3단선반">
+                                        <span class="text-base">3단선반</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- 밀워키PV5 -->
+                            <div class="border-2 border-red-200 rounded-lg p-4 bg-red-50">
+                                <h3 class="text-lg font-bold text-red-900 mb-3 flex items-center">
+                                    <i class="fas fa-tools mr-2"></i>
+                                    밀워키PV5
+                                </h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 스마트에디션">
+                                        <span class="text-base">스마트에디션</span>
+                                    </label>
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 워크스테이션">
+                                        <span class="text-base">워크스테이션</span>
+                                    </label>
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 3단부품선반">
+                                        <span class="text-base">3단부품선반</span>
+                                    </label>
+                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 3단선반">
+                                        <span class="text-base">3단선반</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- 기타 입력란 -->
@@ -600,7 +615,6 @@ app.get('/', (c) => {
                 // Validate form
                 const installDate = document.getElementById('installDate').value;
                 const vehicleVin = document.getElementById('vehicleVin').value;
-                const productName = document.getElementById('productName').value;
                 
                 // Collect selected products
                 const selectedProducts = [];
@@ -615,15 +629,16 @@ app.get('/', (c) => {
                     selectedProducts.push(otherInput.value.trim());
                 }
                 
-                const productConfig = selectedProducts.join(', ');
+                const productName = selectedProducts.join(', ');
+                const productConfig = productName; // 동일한 값
                 
                 const installerName = document.getElementById('installerName').value;
                 const customerName = document.getElementById('customerName').value;
                 const customerEmail = document.getElementById('customerEmail').value;
 
-                if (!installDate || !vehicleVin || !productName || !productConfig || 
+                if (!installDate || !vehicleVin || !productName || 
                     !installerName || !customerName || !customerEmail) {
-                    alert('모든 필수 항목을 입력해주세요.\\n제품 구성은 최소 1개 이상 선택해야 합니다.');
+                    alert('모든 필수 항목을 입력해주세요.\\n제품 시공명은 최소 1개 이상 선택해야 합니다.');
                     return;
                 }
 
