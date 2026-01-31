@@ -839,12 +839,17 @@ app.get('/', (c) => {
                     
                     console.log('📄 PDF 컨텐츠 길이:', pdfContent.length);
                     
-                    // 임시 div 생성
+                    // 임시 div 생성 (화면에 보이도록 설정)
                     console.log('🔧 임시 DOM 요소 생성...');
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = pdfContent;
-                    tempDiv.style.position = 'absolute';
-                    tempDiv.style.left = '-9999px';
+                    // 화면 상단에 표시 (html2canvas가 렌더링할 수 있도록)
+                    tempDiv.style.position = 'fixed';
+                    tempDiv.style.top = '0';
+                    tempDiv.style.left = '0';
+                    tempDiv.style.width = '210mm'; // A4 너비
+                    tempDiv.style.zIndex = '-1'; // 다른 요소 뒤에 표시
+                    tempDiv.style.opacity = '0'; // 투명하게 (보이지 않지만 렌더링은 됨)
                     document.body.appendChild(tempDiv);
                     console.log('✅ 임시 DOM 요소 추가 완료');
                     
