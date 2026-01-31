@@ -822,7 +822,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
 
 
             // 공통 검증 함수
-            function validateForm() {
+            window.validateForm = function() {
                 const installDate = document.getElementById('installDate').value;
                 const vehicleVin = document.getElementById('vehicleVin').value;
                 
@@ -874,7 +874,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
             // 📧 이메일 발송 버튼
             window.submitEmail = async function() {
                 console.log('✅ submitEmail 함수 호출됨');
-                const formData = validateForm();
+                const formData = window.validateForm();
                 if (!formData) {
                     console.log('❌ validateForm 실패');
                     return;
@@ -973,7 +973,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
             // 📄 PDF 다운로드 버튼
             window.downloadPDF = async function() {
                 console.log('✅ downloadPDF 함수 호출됨');
-                const formData = validateForm();
+                const formData = window.validateForm();
                 if (!formData) {
                     console.log('❌ validateForm 실패');
                     return;

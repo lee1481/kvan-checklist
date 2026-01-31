@@ -839,7 +839,7 @@ app.get('/', (c) => {
 
 
             // 공통 검증 함수
-            function validateForm() {
+            window.validateForm = function() {
                 const installDate = document.getElementById('installDate').value;
                 const vehicleVin = document.getElementById('vehicleVin').value;
                 
@@ -891,7 +891,7 @@ app.get('/', (c) => {
             // 📧 이메일 발송 버튼
             window.submitEmail = async function() {
                 console.log('✅ submitEmail 함수 호출됨');
-                const formData = validateForm();
+                const formData = window.validateForm();
                 if (!formData) {
                     console.log('❌ validateForm 실패');
                     return;
@@ -990,7 +990,7 @@ app.get('/', (c) => {
             // 📄 PDF 다운로드 버튼
             window.downloadPDF = async function() {
                 console.log('✅ downloadPDF 함수 호출됨');
-                const formData = validateForm();
+                const formData = window.validateForm();
                 if (!formData) {
                     console.log('❌ validateForm 실패');
                     return;
