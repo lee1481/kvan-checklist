@@ -397,41 +397,36 @@ app.get('/', (c) => {
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'bg-white rounded-lg shadow-lg p-6 mb-6 section-card';
                 sectionDiv.innerHTML = \`
-                    <h2 class="text-lg font-bold text-blue-900 mb-4">\${section.title}</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-blue-900">\${section.title}</h2>
+                        <div>
+                            <input type="file" 
+                                id="section-photo-\${sectionIndex}" 
+                                accept="image/*" 
+                                multiple
+                                class="hidden"
+                                onchange="handleSectionPhotoUpload(this, \${sectionIndex})">
+                            <label for="section-photo-\${sectionIndex}" 
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg cursor-pointer hover:bg-green-600 transition">
+                                <i class="fas fa-camera"></i>
+                                <span class="text-sm font-medium">사진</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo previews for this section -->
+                    <div id="section-photos-\${sectionIndex}" class="mb-4 flex flex-wrap gap-2"></div>
+                    
                     <div class="space-y-3">
                         \${section.items.map((item, itemIndex) => \`
                             <div class="p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center justify-between">
                                     <span class="flex-1 text-base">\${item}</span>
-                                    <div class="flex gap-2">
-                                        <input type="file" 
-                                            id="photo-\${sectionIndex}-\${itemIndex}" 
-                                            accept="image/*" 
-                                            capture="environment"
-                                            class="hidden"
-                                            onchange="handlePhotoUpload(this, \${sectionIndex}, \${itemIndex})">
-                                        <label for="photo-\${sectionIndex}-\${itemIndex}" 
-                                            class="photo-button"
-                                            id="photo-btn-\${sectionIndex}-\${itemIndex}">
-                                            <i class="fas fa-camera text-2xl"></i>
-                                        </label>
-                                        <div class="touch-checkbox" 
-                                            data-section="\${sectionIndex}" 
-                                            data-item="\${itemIndex}"
-                                            onclick="toggleCheck(this)">
-                                            <i class="fas fa-check text-2xl hidden"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="photo-preview-\${sectionIndex}-\${itemIndex}" class="hidden">
-                                    <div class="relative inline-block">
-                                        <img class="photo-preview cursor-pointer" 
-                                            onclick="showImageModal(this.src)">
-                                        <button onclick="deletePhoto(\${sectionIndex}, \${itemIndex})"
-                                            class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition"
-                                            style="transform: translate(25%, -25%);">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                    <div class="touch-checkbox" 
+                                        data-section="\${sectionIndex}" 
+                                        data-item="\${itemIndex}"
+                                        onclick="toggleCheck(this)">
+                                        <i class="fas fa-check text-2xl hidden"></i>
                                     </div>
                                 </div>
                             </div>
@@ -512,82 +507,103 @@ app.get('/', (c) => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             };
 
-            // Photo handling functions
-            window.handlePhotoUpload = function(input, sectionIndex, itemIndex) {
-                const file = input.files[0];
-                if (!file) return;
+            // Photo handling functions - Section-based multiple photos
+            window.handleSectionPhotoUpload = function(input, sectionIndex) {
+                const files = input.files;
+                if (!files || files.length === 0) return;
 
-                // Check file size (max 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('사진 크기는 5MB 이하여야 합니다.');
-                    input.value = '';
-                    return;
+                // Initialize section photos array if not exists
+                if (!photos[\`section-\${sectionIndex}\`]) {
+                    photos[\`section-\${sectionIndex}\`] = [];
                 }
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Compress and resize image
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        // Calculate new dimensions (max 1200px)
-                        let width = img.width;
-                        let height = img.height;
-                        const maxDimension = 1200;
-                        
-                        if (width > maxDimension || height > maxDimension) {
-                            if (width > height) {
-                                height = (height / width) * maxDimension;
-                                width = maxDimension;
-                            } else {
-                                width = (width / height) * maxDimension;
-                                height = maxDimension;
+                Array.from(files).forEach(file => {
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert(\`사진 크기는 5MB 이하여야 합니다: \${file.name}\`);
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Compress and resize image
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            // Calculate new dimensions (max 1200px)
+                            let width = img.width;
+                            let height = img.height;
+                            const maxDimension = 1200;
+                            
+                            if (width > maxDimension || height > maxDimension) {
+                                if (width > height) {
+                                    height = (height / width) * maxDimension;
+                                    width = maxDimension;
+                                } else {
+                                    width = (width / height) * maxDimension;
+                                    height = maxDimension;
+                                }
                             }
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Convert to base64 with compression (0.8 quality)
-                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                        
-                        // Store photo
-                        const photoKey = \`\${sectionIndex}-\${itemIndex}\`;
-                        photos[photoKey] = compressedDataUrl;
-                        
-                        // Update UI
-                        const previewContainer = document.getElementById(\`photo-preview-\${sectionIndex}-\${itemIndex}\`);
-                        const previewImg = previewContainer.querySelector('img');
-                        const photoBtn = document.getElementById(\`photo-btn-\${sectionIndex}-\${itemIndex}\`);
-                        
-                        previewImg.src = compressedDataUrl;
-                        previewContainer.classList.remove('hidden');
-                        photoBtn.classList.add('has-photo');
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Convert to base64 with compression (0.8 quality)
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            
+                            // Store photo
+                            const photoId = \`section-\${sectionIndex}-\${Date.now()}-\${Math.random().toString(36).substr(2, 9)}\`;
+                            photos[\`section-\${sectionIndex}\`].push({
+                                id: photoId,
+                                data: compressedDataUrl
+                            });
+                            
+                            // Update UI
+                            renderSectionPhotos(sectionIndex);
+                        };
+                        img.src = e.target.result;
                     };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                    reader.readAsDataURL(file);
+                });
             };
 
-            window.deletePhoto = function(sectionIndex, itemIndex) {
+            window.renderSectionPhotos = function(sectionIndex) {
+                const container = document.getElementById(\`section-photos-\${sectionIndex}\`);
+                const sectionPhotos = photos[\`section-\${sectionIndex}\`] || [];
+                
+                if (sectionPhotos.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+                
+                container.innerHTML = sectionPhotos.map(photo => \`
+                    <div class="relative inline-block">
+                        <img src="\${photo.data}" 
+                            class="w-24 h-24 object-cover rounded-lg cursor-pointer border-2 border-gray-300"
+                            onclick="showImageModal(this.src)">
+                        <button onclick="deleteSectionPhoto(\${sectionIndex}, '\${photo.id}')"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition text-xs">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                \`).join('');
+            };
+
+            window.deleteSectionPhoto = function(sectionIndex, photoId) {
                 if (!confirm('이 사진을 삭제하시겠습니까?')) return;
                 
-                const photoKey = \`\${sectionIndex}-\${itemIndex}\`;
-                delete photos[photoKey];
+                const sectionPhotos = photos[\`section-\${sectionIndex}\`] || [];
+                photos[\`section-\${sectionIndex}\`] = sectionPhotos.filter(p => p.id !== photoId);
                 
                 // Clear file input
-                const input = document.getElementById(\`photo-\${sectionIndex}-\${itemIndex}\`);
+                const input = document.getElementById(\`section-photo-\${sectionIndex}\`);
                 input.value = '';
                 
                 // Update UI
-                const previewContainer = document.getElementById(\`photo-preview-\${sectionIndex}-\${itemIndex}\`);
-                const photoBtn = document.getElementById(\`photo-btn-\${sectionIndex}-\${itemIndex}\`);
-                
-                previewContainer.classList.add('hidden');
-                photoBtn.classList.remove('has-photo');
+                renderSectionPhotos(sectionIndex);
             };
 
             window.showImageModal = function(src) {
@@ -698,10 +714,21 @@ app.get('/', (c) => {
                     return;
                 }
 
-                // Debug log
+                // Debug log - Convert section photos to flat structure
+                const flatPhotos = {};
+                let totalPhotoCount = 0;
+                Object.keys(photos).forEach(sectionKey => {
+                    if (Array.isArray(photos[sectionKey])) {
+                        photos[sectionKey].forEach((photo, idx) => {
+                            flatPhotos[\`\${sectionKey}-\${idx}\`] = photo.data;
+                            totalPhotoCount++;
+                        });
+                    }
+                });
+                
                 console.log('📤 제출 데이터:', {
-                    사진개수: Object.keys(photos).length,
-                    사진키목록: Object.keys(photos),
+                    사진개수: totalPhotoCount,
+                    섹션별사진: Object.keys(photos).map(k => \`\${k}: \${photos[k]?.length || 0}장\`),
                     시공자서명길이: installerSignature.length,
                     고객서명길이: customerSignature.length
                 });
@@ -721,7 +748,7 @@ app.get('/', (c) => {
                         checklist,
                         installerSignature,
                         customerSignature,
-                        photos: photos
+                        photos: flatPhotos
                     });
 
                     if (response.data.success) {
