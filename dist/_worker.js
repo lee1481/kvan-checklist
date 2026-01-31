@@ -393,8 +393,8 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                 }
             });
 
-            // Store photos
-            const photos = {};
+            // Store photos (전역으로 변경)
+            window.photos = {};
 
             // Render checklist sections
             const container = document.getElementById('checklist-container');
@@ -538,8 +538,8 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                 if (!files || files.length === 0) return;
 
                 // Initialize section photos array if not exists
-                if (!photos[\`section-\${sectionIndex}\`]) {
-                    photos[\`section-\${sectionIndex}\`] = [];
+                if (!window.photos[\`section-\${sectionIndex}\`]) {
+                    window.photos[\`section-\${sectionIndex}\`] = [];
                 }
 
                 Array.from(files).forEach(file => {
@@ -581,7 +581,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                             
                             // Store photo
                             const photoId = \`section-\${sectionIndex}-\${Date.now()}-\${Math.random().toString(36).substr(2, 9)}\`;
-                            photos[\`section-\${sectionIndex}\`].push({
+                            window.photos[\`section-\${sectionIndex}\`].push({
                                 id: photoId,
                                 data: compressedDataUrl
                             });
@@ -597,7 +597,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
 
             window.renderSectionPhotos = function(sectionIndex) {
                 const container = document.getElementById(\`section-photos-\${sectionIndex}\`);
-                const sectionPhotos = photos[\`section-\${sectionIndex}\`] || [];
+                const sectionPhotos = window.photos[\`section-\${sectionIndex}\`] || [];
                 
                 if (sectionPhotos.length === 0) {
                     container.innerHTML = '';
@@ -620,8 +620,8 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
             window.deleteSectionPhoto = function(sectionIndex, photoId) {
                 if (!confirm('이 사진을 삭제하시겠습니까?')) return;
                 
-                const sectionPhotos = photos[\`section-\${sectionIndex}\`] || [];
-                photos[\`section-\${sectionIndex}\`] = sectionPhotos.filter(p => p.id !== photoId);
+                const sectionPhotos = window.photos[\`section-\${sectionIndex}\`] || [];
+                window.photos[\`section-\${sectionIndex}\`] = sectionPhotos.filter(p => p.id !== photoId);
                 
                 // Clear file input
                 const input = document.getElementById(\`section-photo-\${sectionIndex}\`);
@@ -708,11 +708,11 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                     
                     // 사진 데이터 수집
                     let photosHTML = '';
-                    const photoSections = Object.keys(photos);
+                    const photoSections = Object.keys(window.photos);
                     if (photoSections.length > 0) {
                         photosHTML = '<div style="page-break-before: always;"><h3 style="background: #2c5aa0; color: white; padding: 10px; margin: 20px 0 10px 0;">📸 첨부 사진</h3>';
                         photoSections.forEach(sectionKey => {
-                            const sectionPhotos = photos[sectionKey];
+                            const sectionPhotos = window.photos[sectionKey];
                             if (sectionPhotos && sectionPhotos.length > 0) {
                                 const sectionIndex = parseInt(sectionKey.replace('section-', ''));
                                 const sectionTitle = sections[sectionIndex]?.title || '섹션 ' + (sectionIndex + 1);
@@ -929,14 +929,14 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                 const customerSignature = canvases.customer.toDataURL('image/png');
                 
                 console.log('📤 제출 데이터:', {
-                    사진개수: Object.keys(photos).reduce((acc, key) => acc + (photos[key]?.length || 0), 0),
+                    사진개수: Object.keys(window.photos).reduce((acc, key) => acc + (window.photos[key]?.length || 0), 0),
                     시공자서명길이: installerSignature.length,
                     고객서명길이: customerSignature.length
                 });
 
                 // Flatten photos for API
                 const flatPhotos = {};
-                Object.entries(photos).forEach(([sectionKey, photoArray]) => {
+                Object.entries(window.photos).forEach(([sectionKey, photoArray]) => {
                     if (photoArray && photoArray.length > 0) {
                         photoArray.forEach((photo, index) => {
                             flatPhotos[\`\${sectionKey}-\${index}\`] = photo.data;
@@ -1086,9 +1086,9 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                 // Debug log - Convert section photos to flat structure
                 const flatPhotos = {};
                 let totalPhotoCount = 0;
-                Object.keys(photos).forEach(sectionKey => {
-                    if (Array.isArray(photos[sectionKey])) {
-                        photos[sectionKey].forEach((photo, idx) => {
+                Object.keys(window.photos).forEach(sectionKey => {
+                    if (Array.isArray(window.photos[sectionKey])) {
+                        window.photos[sectionKey].forEach((photo, idx) => {
                             flatPhotos[\`\${sectionKey}-\${idx}\`] = photo.data;
                             totalPhotoCount++;
                         });
@@ -1097,7 +1097,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                 
                 console.log('📤 제출 데이터:', {
                     사진개수: totalPhotoCount,
-                    섹션별사진: Object.keys(photos).map(k => \`\${k}: \${photos[k]?.length || 0}장\`),
+                    섹션별사진: Object.keys(window.photos).map(k => \`\${k}: \${window.photos[k]?.length || 0}장\`),
                     시공자서명길이: installerSignature.length,
                     고객서명길이: customerSignature.length,
                     이메일개수: emailList.length
