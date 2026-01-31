@@ -820,11 +820,11 @@ app.get('/', (c) => {
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = pdfHTML;
                     tempDiv.style.position = 'absolute';
-                    tempDiv.style.left = '0';
+                    tempDiv.style.left = '-9999px';
                     tempDiv.style.top = '0';
                     tempDiv.style.width = '210mm';
                     tempDiv.style.background = 'white';
-                    tempDiv.style.zIndex = '-1000';
+                    tempDiv.style.visibility = 'hidden';
                     document.body.appendChild(tempDiv);
                     
                     console.log('📸 html2canvas 캡처 시작...');
