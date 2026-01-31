@@ -876,9 +876,6 @@ app.get('/', (c) => {
                     
                     console.log('✅ PDF 생성 완료');
                     
-                    // 임시 DIV 제거
-                    document.body.removeChild(tempDiv);
-                    
                     // PDF 저장
                     const filename = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.pdf';
                     
