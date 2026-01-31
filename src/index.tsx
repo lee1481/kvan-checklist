@@ -189,10 +189,53 @@ app.get('/', (c) => {
                             placeholder="예: 케이밴 풀 패키지" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">제품 구성</label>
-                        <textarea id="productConfig" rows="3"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="예: 차바닥, 격벽타공판, 2단선반, 3단선반 등" required></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">제품 구성 (해당 항목 체크)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 스마트패키지">
+                                <span class="text-base">기아PV5 스마트패키지</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 워크스테이션">
+                                <span class="text-base">기아PV5 워크스테이션</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 기아 3단부품선반">
+                                <span class="text-base">PV5 기아 3단부품선반</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 기아 3단선반">
+                                <span class="text-base">PV5 기아 3단선반</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 스마트에디션">
+                                <span class="text-base">PV5 밀워키 스마트에디션</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 워크스테이션">
+                                <span class="text-base">PV5 밀워키 워크스테이션</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 3단부품선반">
+                                <span class="text-base">PV5 밀워키 3단부품선반</span>
+                            </label>
+                            <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="PV5 밀워키 3단선반">
+                                <span class="text-base">PV5 밀워키 3단선반</span>
+                            </label>
+                        </div>
+                        
+                        <!-- 기타 입력란 -->
+                        <div class="mt-4">
+                            <label class="flex items-center mb-2">
+                                <input type="checkbox" id="otherProductCheckbox" class="w-5 h-5 text-blue-600 mr-3">
+                                <span class="text-base font-medium text-gray-700">기타 (직접 입력)</span>
+                            </label>
+                            <input type="text" id="otherProductInput" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                                placeholder="기타 제품명을 입력하세요"
+                                disabled>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -315,6 +358,20 @@ app.get('/', (c) => {
             // Set today's date
             document.getElementById('today').textContent = new Date().toLocaleDateString('ko-KR');
             document.getElementById('installDate').valueAsDate = new Date();
+
+            // Handle "기타" checkbox and input
+            const otherCheckbox = document.getElementById('otherProductCheckbox');
+            const otherInput = document.getElementById('otherProductInput');
+            
+            otherCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    otherInput.disabled = false;
+                    otherInput.focus();
+                } else {
+                    otherInput.disabled = true;
+                    otherInput.value = '';
+                }
+            });
 
             // Store photos
             const photos = {};
@@ -544,14 +601,29 @@ app.get('/', (c) => {
                 const installDate = document.getElementById('installDate').value;
                 const vehicleVin = document.getElementById('vehicleVin').value;
                 const productName = document.getElementById('productName').value;
-                const productConfig = document.getElementById('productConfig').value;
+                
+                // Collect selected products
+                const selectedProducts = [];
+                document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
+                    selectedProducts.push(cb.value);
+                });
+                
+                // Check "기타" input
+                const otherCheckbox = document.getElementById('otherProductCheckbox');
+                const otherInput = document.getElementById('otherProductInput');
+                if (otherCheckbox.checked && otherInput.value.trim()) {
+                    selectedProducts.push(otherInput.value.trim());
+                }
+                
+                const productConfig = selectedProducts.join(', ');
+                
                 const installerName = document.getElementById('installerName').value;
                 const customerName = document.getElementById('customerName').value;
                 const customerEmail = document.getElementById('customerEmail').value;
 
                 if (!installDate || !vehicleVin || !productName || !productConfig || 
                     !installerName || !customerName || !customerEmail) {
-                    alert('모든 필수 항목을 입력해주세요.');
+                    alert('모든 필수 항목을 입력해주세요.\\n제품 구성은 최소 1개 이상 선택해야 합니다.');
                     return;
                 }
 
