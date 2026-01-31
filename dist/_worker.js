@@ -873,7 +873,6 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
 
             // 📧 이메일 발송 버튼
             window.submitEmail = async function() {
-                alert('🎉 이메일 발송 버튼이 클릭되었습니다!');
                 console.log('✅ submitEmail 함수 호출됨');
                 const formData = window.validateForm();
                 if (!formData) {
@@ -973,7 +972,6 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
 
             // 📄 PDF 다운로드 버튼
             window.downloadPDF = async function() {
-                alert('🎉 PDF 다운로드 버튼이 클릭되었습니다!');
                 console.log('✅ downloadPDF 함수 호출됨');
                 const formData = window.validateForm();
                 if (!formData) {
