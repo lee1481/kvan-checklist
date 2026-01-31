@@ -670,13 +670,17 @@ app.get('/', (c) => {
 
             // PDF 생성 함수
             window.generatePDF = async function() {
+                console.log('🚀 PDF 생성 시작!');
                 try {
                     // 로딩 표시
                     document.getElementById('loadingOverlay').classList.remove('hidden');
+                    console.log('⏳ 로딩 오버레이 표시');
                     
                     // PDF 생성할 컨텐츠 준비
                     const installDate = document.getElementById('installDate').value;
                     const vehicleVin = document.getElementById('vehicleVin').value;
+                    console.log('📅 시공일자:', installDate);
+                    console.log('🚗 차대번호:', vehicleVin);
                     const selectedProducts = [];
                     document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
                         selectedProducts.push(cb.value);
@@ -689,6 +693,9 @@ app.get('/', (c) => {
                     const productName = selectedProducts.join(', ');
                     const installerName = document.getElementById('installerName').value;
                     const customerName = document.getElementById('customerName').value;
+                    console.log('📦 제품명:', productName);
+                    console.log('👷 시공자:', installerName);
+                    console.log('👤 고객명:', customerName);
                     
                     // 체크리스트 데이터 수집
                     let checklistHTML = '';
@@ -724,8 +731,10 @@ app.get('/', (c) => {
                     });
                     
                     // 사진 데이터 수집
+                    console.log('📸 사진 수집 시작...');
                     let photosHTML = '';
                     const photoSections = Object.keys(window.photos);
+                    console.log('📸 사진 섹션 개수:', photoSections.length);
                     if (photoSections.length > 0) {
                         photosHTML = '<div style="page-break-before: always;"><h3 style="background: #2c5aa0; color: white; padding: 10px; margin: 20px 0 10px 0;">📸 첨부 사진</h3>';
                         photoSections.forEach(sectionKey => {
@@ -747,9 +756,13 @@ app.get('/', (c) => {
                     }
                     
                     // 서명 이미지
+                    console.log('✍️  서명 데이터 추출 시작...');
                     const installerSig = canvases.installer.toDataURL('image/png');
                     const customerSig = canvases.customer.toDataURL('image/png');
+                    console.log('✍️  시공자 서명 길이:', installerSig.length);
+                    console.log('✍️  고객 서명 길이:', customerSig.length);
                     
+                    console.log('📄 PDF 컨텐츠 생성 시작...');
                     // PDF 컨텐츠 생성
                     const pdfContent = \`
                         <div style="font-family: 'Malgun Gothic', Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
@@ -824,12 +837,22 @@ app.get('/', (c) => {
                         </div>
                     \`;
                     
+                    console.log('📄 PDF 컨텐츠 길이:', pdfContent.length);
+                    
                     // 임시 div 생성
+                    console.log('🔧 임시 DOM 요소 생성...');
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = pdfContent;
                     tempDiv.style.position = 'absolute';
                     tempDiv.style.left = '-9999px';
                     document.body.appendChild(tempDiv);
+                    console.log('✅ 임시 DOM 요소 추가 완료');
+                    
+                    // html2pdf 존재 확인
+                    if (typeof html2pdf === 'undefined') {
+                        throw new Error('html2pdf 라이브러리가 로드되지 않았습니다!');
+                    }
+                    console.log('✅ html2pdf 라이브러리 확인 완료');
                     
                     // PDF 생성 옵션
                     const opt = {
@@ -839,9 +862,12 @@ app.get('/', (c) => {
                         html2canvas: { scale: 2, useCORS: true, logging: false },
                         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                     };
+                    console.log('📋 PDF 옵션:', opt);
                     
                     // PDF 생성
+                    console.log('🚀 html2pdf 호출 시작...');
                     await html2pdf().set(opt).from(tempDiv).save();
+                    console.log('✅ PDF 생성 완료!');
                     
                     // 임시 div 제거
                     document.body.removeChild(tempDiv);
@@ -852,8 +878,9 @@ app.get('/', (c) => {
                     console.log('✅ PDF 다운로드 완료');
                 } catch (error) {
                     console.error('❌ PDF 생성 오류:', error);
+                    console.error('❌ 에러 스택:', error.stack);
                     document.getElementById('loadingOverlay').classList.add('hidden');
-                    alert('PDF 생성 중 오류가 발생했습니다.\\n' + error.message);
+                    alert('PDF 생성 중 오류가 발생했습니다.\\n상세 정보:\\n' + error.message + '\\n\\n콘솔(F12)에서 자세한 로그를 확인하세요.');
                 }
             };
 
