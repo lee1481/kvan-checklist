@@ -825,11 +825,16 @@ app.get('/', (c) => {
                     
                     console.log('📸 html2canvas 캡처 시작...');
                     
+                    // 모바일 디바이스 감지
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                    const scale = isMobile ? 1 : 2;
+                    console.log('🎯 디바이스:', isMobile ? '모바일' : '데스크톱', '/ Scale:', scale);
+                    
                     // 약간의 딜레이 후 캡처 (렌더링 완료 대기)
                     await new Promise(resolve => setTimeout(resolve, 500));
                     
                     const canvas = await html2canvas(tempDiv.querySelector('#pdf-content'), {
-                        scale: 2,
+                        scale: scale,
                         useCORS: true,
                         logging: false,
                         backgroundColor: '#ffffff',
@@ -868,8 +873,33 @@ app.get('/', (c) => {
                     
                     // PDF 저장
                     const filename = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.pdf';
-                    pdf.save(filename);
-                    console.log('✅ PDF 다운로드 완료!');
+                    
+                    // iOS 추가 감지 (이미 위에서 isMobile 선언됨)
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                    
+                    if (isMobile || isIOS) {
+                        // 모바일/iOS: Blob URL 방식
+                        console.log('📱 모바일 다운로드 시작...');
+                        const blob = pdf.output('blob');
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                            console.log('✅ PDF 다운로드 완료 (모바일)!');
+                        }, 100);
+                    } else {
+                        // 데스크톱: 기존 방식
+                        console.log('💻 데스크톱 다운로드 시작...');
+                        pdf.save(filename);
+                        console.log('✅ PDF 다운로드 완료 (데스크톱)!');
+                    }
                     
                     // 정리
                     document.body.removeChild(tempDiv);
