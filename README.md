@@ -59,6 +59,10 @@
 - ✅ 고객 서명 (이름 + 이메일 + 서명)
 - ✅ 서명 지우기 기능
 - ✅ 마우스 및 터치 입력 지원
+- ✅ **좌표 정확도 개선 (v1.7.0)** 🆕
+  - Canvas scale 비율 자동 계산
+  - 마우스/터치 커서와 그려지는 선 정확히 일치
+  - 모든 화면 크기에서 정확한 서명 가능
 
 ### 6. 📧 이메일 발송 기능 (v1.4.0)
 - ✅ **동시에 최대 3개 이메일 주소로 발송 가능**
@@ -75,11 +79,16 @@
   - 점검표 전체 내용 포함 (시공 정보, 체크리스트, 사진, 서명)
   - A4 포맷, 고품질 이미지 (scale: 2)
   - 파일명 자동 생성: `케이밴_점검표_{차대번호}_{날짜}.pdf`
-- ✅ **독립 버튼 제공 (NEW! v1.6.0)**
+- ✅ **독립 버튼 제공 (v1.6.0)**
   - 📧 이메일 발송 버튼: 이메일만 발송
   - 📄 PDF 다운로드 버튼: PDF만 다운로드
   - 가로 2단 레이아웃 (태블릿 최적화)
   - 사용자 선택권 강화 (confirm 다이얼로그 제거)
+- ✅ **모바일 최적화 (v1.6.1)** 🆕
+  - iOS/Android 자동 감지
+  - 모바일: Blob URL 방식 (메모리 최적화, scale: 1)
+  - 데스크톱: pdf.save() 방식 (고해상도, scale: 2)
+  - iOS Files 앱 및 Android Downloads 폴더 호환
 - ✅ **보관 및 출력 최적화**
   - 프린터 출력 최적화 (page-break-inside: avoid)
   - 장기 보관용 고품질 PDF
@@ -111,15 +120,16 @@
 
 ## 📡 현재 접속 URL
 
+### 프로덕션 (Cloudflare Pages)
+- **URL**: https://kvan-checklist.pages.dev ⭐
+- **상태**: ✅ 활성
+- **용도**: 실제 사용 (Production)
+- **최신 기능**: 📸 사진 첨부 + 📧 이메일 발송 + 📄 PDF 다운로드 + ✍️ 정확한 서명!
+
 ### 개발 서버 (Sandbox)
 - **URL**: https://3000-iw3be9zf2hohe1e3yfcxw-c81df28e.sandbox.novita.ai
 - **상태**: ✅ 활성
 - **용도**: 개발 및 테스트
-- **새 기능**: 📸 사진 첨부 가능!
-
-### 프로덕션 (예정)
-- **URL**: TBD (Cloudflare Pages 배포 후)
-- **상태**: ⏳ 배포 예정
 
 ## 🛠️ 기술 스택
 
@@ -347,9 +357,29 @@ wrangler pages secret put FROM_EMAIL --project-name kvan-checklist
 3. 통계 및 리포트
 4. 사진 일괄 다운로드
 
-## 🎉 최신 업데이트 (v1.6.0)
+## 🎉 최신 업데이트 (v1.7.0)
 
-### 2026-01-31: 이메일 발송과 PDF 다운로드 버튼 분리! 🎨
+### 2026-01-31: 서명 캔버스 좌표 정확도 개선! ✍️ (v1.7.0)
+- ✅ Canvas scale 비율 자동 계산
+  - `scaleX = canvas.width / rect.width`
+  - `scaleY = canvas.height / rect.height`
+- ✅ 마우스/터치 좌표 정확한 변환
+  - `actualX = (clientX - rect.left) * scaleX`
+  - `actualY = (clientY - rect.top) * scaleY`
+- ✅ 커서 위치와 그려지는 선 정확히 일치
+- ✅ 모든 화면 크기에서 정확한 서명 가능
+- ✅ 손글씨처럼 자연스러운 서명 경험
+
+### 2026-01-31: 모바일 PDF 다운로드 최적화! 📱 (v1.6.1)
+- ✅ 디바이스 자동 감지 (iPhone/iPad/iPod/Android)
+- ✅ 모바일 Blob URL 방식
+  - `pdf.output('blob')` + `URL.createObjectURL()`
+  - `<a>` 태그 download 속성 사용
+- ✅ 모바일 메모리 최적화 (scale: 1)
+- ✅ 데스크톱 고해상도 유지 (scale: 2)
+- ✅ iOS Files 앱 및 Android Downloads 폴더 호환
+
+### 2026-01-31: 이메일 발송과 PDF 다운로드 버튼 분리! 🎨 (v1.6.0)
 - ✅ 독립 버튼 2개로 분리
   - 📧 **이메일 발송 버튼** (파란색): 이메일만 발송
   - 📄 **PDF 다운로드 버튼** (초록색): PDF만 다운로드
@@ -415,4 +445,11 @@ wrangler pages secret put FROM_EMAIL --project-name kvan-checklist
 
 **최종 업데이트**: 2026년 1월 31일  
 **개발자**: 사인마스터 (AI 기반 간판 디자인 자동화 전문가)  
-**버전**: v1.3.0 (섹션별 다중 사진 업로드 방식 개선)
+**버전**: v1.7.0 (서명 캔버스 좌표 정확도 개선)
+
+### 최신 배포 정보
+- **Cloudflare Pages**: ✅ 배포 완료
+- **Production URL**: https://kvan-checklist.pages.dev
+- **GitHub**: https://github.com/lee1481/kvan-checklist.git
+- **Commit**: eafc884 (서명 캔버스 좌표 개선)
+- **배포 일시**: 2026-01-31 10:02 UTC
