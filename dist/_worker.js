@@ -464,6 +464,26 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                 customer: false
             };
 
+            // Check if signature is empty
+            const isSignatureEmpty = (canvas) => {
+                const ctx = canvas.getContext('2d');
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                
+                // Check if there are any non-white pixels (drawing exists)
+                for (let i = 0; i < imageData.length; i += 4) {
+                    const r = imageData[i];
+                    const g = imageData[i + 1];
+                    const b = imageData[i + 2];
+                    const a = imageData[i + 3];
+                    
+                    // If pixel is not white and not transparent, signature exists
+                    if ((r < 250 || g < 250 || b < 250) && a > 0) {
+                        return false; // Signature exists!
+                    }
+                }
+                return true; // Empty signature
+            };
+
             // Setup signature pads
             Object.keys(canvases).forEach(type => {
                 const canvas = canvases[type];
@@ -1052,27 +1072,7 @@ var xt=Object.defineProperty;var Be=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                     customer: customerSignature.length
                 });
 
-                // Check if signatures are empty (improved detection)
-                const isSignatureEmpty = (canvas) => {
-                    const ctx = canvas.getContext('2d');
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                    
-                    // Check if there are any non-white pixels (drawing exists)
-                    for (let i = 0; i < imageData.length; i += 4) {
-                        const r = imageData[i];
-                        const g = imageData[i + 1];
-                        const b = imageData[i + 2];
-                        const a = imageData[i + 3];
-                        
-                        // If pixel is not white and not transparent, signature exists
-                        if ((r < 250 || g < 250 || b < 250) && a > 0) {
-                            return false; // Signature exists!
-                        }
-                    }
-                    
-                    return true; // No signature found
-                };
-
+                // Check if signatures are empty
                 if (isSignatureEmpty(canvases.installer)) {
                     alert('시공자 서명을 해주세요.');
                     return;
