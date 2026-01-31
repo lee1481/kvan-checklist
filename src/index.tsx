@@ -331,17 +331,26 @@ app.get('/', (c) => {
             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                 <p class="text-sm text-yellow-800">
                     <i class="fas fa-exclamation-triangle mr-2"></i>
-                    <strong>안내:</strong> 모든 항목을 확인하고 서명 후 완료 버튼을 눌러주세요. 
-                    입력하신 이메일로 점검표가 자동 발송됩니다. (최대 3개 이메일 동시 발송 가능)
+                    <strong>안내:</strong> 모든 항목을 확인하고 서명 후 원하는 버튼을 눌러주세요.
                 </p>
             </div>
 
-            <!-- Submit Button -->
-            <button id="submitBtn" onclick="submitChecklist()" 
-                class="w-full bg-blue-900 text-white py-4 rounded-lg text-xl font-bold hover:bg-blue-800 transition shadow-lg">
-                <i class="fas fa-paper-plane mr-2"></i>
-                완료 및 이메일 발송
-            </button>
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Email Submit Button -->
+                <button id="emailBtn" onclick="submitEmail()" 
+                    class="w-full bg-blue-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
+                    <i class="fas fa-envelope mr-2"></i>
+                    📧 이메일 발송
+                </button>
+                
+                <!-- PDF Download Button -->
+                <button id="pdfBtn" onclick="downloadPDF()" 
+                    class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    📄 PDF 다운로드
+                </button>
+            </div>
 
             <!-- Loading Overlay -->
             <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -829,7 +838,161 @@ app.get('/', (c) => {
             };
 
 
-            // Submit checklist
+            // 공통 검증 함수
+            function validateForm() {
+                const installDate = document.getElementById('installDate').value;
+                const vehicleVin = document.getElementById('vehicleVin').value;
+                
+                // Collect selected products
+                const selectedProducts = [];
+                document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
+                    selectedProducts.push(cb.value);
+                });
+                
+                const otherCheckbox = document.getElementById('otherProductCheckbox');
+                const otherInput = document.getElementById('otherProductInput');
+                if (otherCheckbox.checked && otherInput.value.trim()) {
+                    selectedProducts.push(otherInput.value.trim());
+                }
+                
+                const productName = selectedProducts.join(', ');
+                const installerName = document.getElementById('installerName').value;
+                const customerName = document.getElementById('customerName').value;
+                const customerEmail1 = document.getElementById('customerEmail1').value.trim();
+
+                if (!installDate || !vehicleVin || !productName || 
+                    !installerName || !customerName || !customerEmail1) {
+                    alert('모든 필수 항목을 입력해주세요.\\n제품 시공명은 최소 1개 이상 선택해야 합니다.');
+                    return null;
+                }
+                
+                // Check signatures
+                if (isSignatureEmpty(canvases.installer)) {
+                    alert('시공자 서명을 해주세요.');
+                    return null;
+                }
+                
+                if (isSignatureEmpty(canvases.customer)) {
+                    alert('고객 서명을 해주세요.');
+                    return null;
+                }
+                
+                return {
+                    installDate,
+                    vehicleVin,
+                    productName,
+                    installerName,
+                    customerName,
+                    customerEmail1
+                };
+            }
+
+
+            // 📧 이메일 발송 버튼
+            window.submitEmail = async function() {
+                const formData = validateForm();
+                if (!formData) return;
+                
+                // Collect email addresses
+                const customerEmail2 = document.getElementById('customerEmail2').value.trim();
+                const customerEmail3 = document.getElementById('customerEmail3').value.trim();
+                const emailList = [formData.customerEmail1, customerEmail2, customerEmail3].filter(e => e);
+                
+                // Validate all email addresses
+                const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+                for (const email of emailList) {
+                    if (!emailRegex.test(email)) {
+                        alert('올바른 이메일 주소를 입력해주세요: ' + email);
+                        return;
+                    }
+                }
+                
+                // Collect checklist data
+                const checklist = {};
+                document.querySelectorAll('.touch-checkbox').forEach(checkbox => {
+                    const section = checkbox.dataset.section;
+                    const item = checkbox.dataset.item;
+                    if (!checklist[section]) checklist[section] = {};
+                    checklist[section][item] = checkbox.classList.contains('checked');
+                });
+
+                // Get signatures
+                const installerSignature = canvases.installer.toDataURL('image/png');
+                const customerSignature = canvases.customer.toDataURL('image/png');
+                
+                console.log('📤 제출 데이터:', {
+                    사진개수: Object.keys(photos).reduce((acc, key) => acc + (photos[key]?.length || 0), 0),
+                    시공자서명길이: installerSignature.length,
+                    고객서명길이: customerSignature.length
+                });
+
+                // Flatten photos for API
+                const flatPhotos = {};
+                Object.entries(photos).forEach(([sectionKey, photoArray]) => {
+                    if (photoArray && photoArray.length > 0) {
+                        photoArray.forEach((photo, index) => {
+                            flatPhotos[\`\${sectionKey}-\${index}\`] = photo.data;
+                        });
+                    }
+                });
+
+                // Show loading
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+
+                try {
+                    const response = await axios.post('/api/submit', {
+                        installDate: formData.installDate,
+                        vehicleVin: formData.vehicleVin,
+                        productName: formData.productName,
+                        productConfig: formData.productName,
+                        installerName: formData.installerName,
+                        customerName: formData.customerName,
+                        customerEmail: formData.customerEmail1,
+                        emailList,
+                        checklist,
+                        installerSignature,
+                        customerSignature,
+                        photos: flatPhotos
+                    });
+
+                    if (response.data.success) {
+                        alert(\`✅ 점검표가 성공적으로 제출되었습니다!\\n\${emailList.length}개 이메일로 발송되었습니다.\`);
+                        window.location.reload();
+                    } else {
+                        throw new Error(response.data.error || '제출 실패');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    const errorData = error.response?.data;
+                    let errorMessage = '❌ 제출 중 오류가 발생했습니다.\\n\\n';
+                    
+                    if (errorData) {
+                        errorMessage += errorData.error || error.message;
+                        if (errorData.hint) {
+                            errorMessage += '\\n\\n💡 ' + errorData.hint;
+                        }
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    
+                    alert(errorMessage);
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            };
+
+
+            // 📄 PDF 다운로드 버튼
+            window.downloadPDF = async function() {
+                const formData = validateForm();
+                if (!formData) return;
+                
+                // PDF 생성
+                await generatePDF();
+            };
+
+
+            // Submit checklist (레거시, 사용 안 함)
             window.submitChecklist = async function() {
                 // Validate form
                 const installDate = document.getElementById('installDate').value;
