@@ -95,60 +95,6 @@ app.get('/', (c) => {
                 border-color: #2c5aa0;
                 box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
             }
-            
-            /* Photo button styles */
-            .photo-button {
-                width: 50px;
-                height: 50px;
-                border: 3px solid #10b981;
-                border-radius: 8px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.2s;
-                background: white;
-                color: #10b981;
-            }
-            
-            .photo-button.has-photo {
-                background: #10b981;
-                color: white;
-            }
-            
-            .photo-button:active {
-                transform: scale(0.95);
-            }
-            
-            /* Photo preview */
-            .photo-preview {
-                max-width: 100%;
-                max-height: 200px;
-                border-radius: 8px;
-                margin-top: 8px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            }
-            
-            /* Image modal */
-            .image-modal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.9);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-                padding: 20px;
-            }
-            
-            .image-modal img {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-            }
         </style>
     </head>
     <body class="bg-gray-50">
@@ -383,20 +329,8 @@ app.get('/', (c) => {
                             placeholder="고객 이름">
                     </div>
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 1 (필수)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
                         <input type="email" id="customerEmail1" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="example@email.com">
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 2 (선택)</label>
-                        <input type="email" id="customerEmail2" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="example@email.com">
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 3 (선택)</label>
-                        <input type="email" id="customerEmail3" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
                             placeholder="example@email.com">
                     </div>
@@ -496,8 +430,8 @@ app.get('/', (c) => {
                 }
             });
 
-            // Store photos (전역으로 변경)
-            window.photos = {};
+            // 사진 기능 제거됨 (사용 안 함)
+            // window.photos = {};
 
             // Render checklist sections
             const container = document.getElementById('checklist-container');
@@ -505,25 +439,9 @@ app.get('/', (c) => {
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'bg-white rounded-lg shadow-lg p-6 mb-6 section-card';
                 sectionDiv.innerHTML = \`
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="mb-4">
                         <h2 class="text-lg font-bold text-blue-900">\${section.title}</h2>
-                        <div>
-                            <input type="file" 
-                                id="section-photo-\${sectionIndex}" 
-                                accept="image/*" 
-                                multiple
-                                class="hidden"
-                                onchange="handleSectionPhotoUpload(this, \${sectionIndex})">
-                            <label for="section-photo-\${sectionIndex}" 
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg cursor-pointer hover:bg-green-600 transition">
-                                <i class="fas fa-camera"></i>
-                                <span class="text-sm font-medium">사진</span>
-                            </label>
-                        </div>
                     </div>
-                    
-                    <!-- Photo previews for this section -->
-                    <div id="section-photos-\${sectionIndex}" class="mb-4 flex flex-wrap gap-2"></div>
                     
                     <div class="space-y-3">
                         \${section.items.map((item, itemIndex) => \`
@@ -640,122 +558,11 @@ app.get('/', (c) => {
             };
 
             // Photo handling functions - Section-based multiple photos
-            window.handleSectionPhotoUpload = function(input, sectionIndex) {
-                const files = input.files;
-                if (!files || files.length === 0) return;
-
-                // Initialize section photos array if not exists
-                if (!window.photos[\`section-\${sectionIndex}\`]) {
-                    window.photos[\`section-\${sectionIndex}\`] = [];
-                }
-
-                Array.from(files).forEach(file => {
-                    // Check file size (max 5MB)
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert(\`사진 크기는 5MB 이하여야 합니다: \${file.name}\`);
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Compress and resize image
-                        const img = new Image();
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            
-                            // Calculate new dimensions (max 1200px)
-                            let width = img.width;
-                            let height = img.height;
-                            const maxDimension = 1200;
-                            
-                            if (width > maxDimension || height > maxDimension) {
-                                if (width > height) {
-                                    height = (height / width) * maxDimension;
-                                    width = maxDimension;
-                                } else {
-                                    width = (width / height) * maxDimension;
-                                    height = maxDimension;
-                                }
-                            }
-                            
-                            canvas.width = width;
-                            canvas.height = height;
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            // Convert to base64 with compression (0.8 quality)
-                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                            
-                            // Store photo
-                            const photoId = \`section-\${sectionIndex}-\${Date.now()}-\${Math.random().toString(36).substr(2, 9)}\`;
-                            window.photos[\`section-\${sectionIndex}\`].push({
-                                id: photoId,
-                                data: compressedDataUrl
-                            });
-                            
-                            // Update UI
-                            renderSectionPhotos(sectionIndex);
-                        };
-                        img.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
-            };
-
-            window.renderSectionPhotos = function(sectionIndex) {
-                const container = document.getElementById(\`section-photos-\${sectionIndex}\`);
-                const sectionPhotos = window.photos[\`section-\${sectionIndex}\`] || [];
-                
-                if (sectionPhotos.length === 0) {
-                    container.innerHTML = '';
-                    return;
-                }
-                
-                container.innerHTML = sectionPhotos.map(photo => \`
-                    <div class="relative inline-block">
-                        <img src="\${photo.data}" 
-                            class="w-24 h-24 object-cover rounded-lg cursor-pointer border-2 border-gray-300"
-                            onclick="showImageModal(this.src)">
-                        <button onclick="deleteSectionPhoto(\${sectionIndex}, '\${photo.id}')"
-                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition text-xs">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                \`).join('');
-            };
-
-            window.deleteSectionPhoto = function(sectionIndex, photoId) {
-                if (!confirm('이 사진을 삭제하시겠습니까?')) return;
-                
-                const sectionPhotos = window.photos[\`section-\${sectionIndex}\`] || [];
-                window.photos[\`section-\${sectionIndex}\`] = sectionPhotos.filter(p => p.id !== photoId);
-                
-                // Clear file input
-                const input = document.getElementById(\`section-photo-\${sectionIndex}\`);
-                input.value = '';
-                
-                // Update UI
-                renderSectionPhotos(sectionIndex);
-            };
-
-            window.showImageModal = function(src) {
-                const modal = document.createElement('div');
-                modal.className = 'image-modal';
-                modal.innerHTML = \`
-                    <div style="position: relative; max-width: 90%; max-height: 90%;">
-                        <img src="\${src}" alt="사진 크게보기">
-                        <button onclick="this.closest('.image-modal').remove()"
-                            class="absolute top-0 right-0 bg-white text-gray-800 rounded-full w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition"
-                            style="transform: translate(50%, -50%);">
-                            <i class="fas fa-times text-2xl"></i>
-                        </button>
-                    </div>
-                \`;
-                modal.onclick = function(e) {
-                    if (e.target === modal) modal.remove();
-                };
-                document.body.appendChild(modal);
-            };
+            // 사진 첨부 기능 제거됨 (사용 안 함)
+            // window.handleSectionPhotoUpload = function(input, sectionIndex) { ... }
+            // window.renderSectionPhotos = function(sectionIndex) { ... }
+            // window.deleteSectionPhoto = function(sectionIndex, photoId) { ... }
+            // window.showImageModal = function(src) { ... }
 
 
             // PDF 생성 함수 (jsPDF + html2canvas 직접 사용)
@@ -1054,12 +861,10 @@ app.get('/', (c) => {
                 }
                 console.log('✅ validateForm 통과:', formData);
                 
-                // Collect email addresses
-                const customerEmail2 = document.getElementById('customerEmail2').value.trim();
-                const customerEmail3 = document.getElementById('customerEmail3').value.trim();
-                const emailList = [formData.customerEmail1, customerEmail2, customerEmail3].filter(e => e);
+                // Collect email address (단일 이메일만)
+                const emailList = formData.customerEmail1 ? [formData.customerEmail1] : [];
                 
-                // Validate all email addresses
+                // Validate email address
                 const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
                 for (const email of emailList) {
                     if (!emailRegex.test(email)) {
@@ -1290,11 +1095,9 @@ app.get('/', (c) => {
                 
                 // Collect email addresses
                 const customerEmail1 = document.getElementById('customerEmail1').value.trim();
-                const customerEmail2 = document.getElementById('customerEmail2').value.trim();
-                const customerEmail3 = document.getElementById('customerEmail3').value.trim();
                 
-                // Collect all valid emails
-                const emailList = [customerEmail1, customerEmail2, customerEmail3].filter(e => e);
+                // Collect email (단일 이메일만)
+                const emailList = customerEmail1 ? [customerEmail1] : [];
                 const customerEmail = customerEmail1; // Primary email for backward compatibility
 
                 if (!installDate || !vehicleVin || !productName || 
@@ -1303,7 +1106,7 @@ app.get('/', (c) => {
                     return;
                 }
 
-                // Validate all email addresses
+                // Validate email address
                 const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
                 for (const email of emailList) {
                     if (!emailRegex.test(email)) {
