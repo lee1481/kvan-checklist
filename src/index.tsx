@@ -1158,7 +1158,7 @@ app.get('/', (c) => {
                     loadingOverlay.classList.remove('hidden');
                     
                     // 전체 페이지 캡처 (버튼 제외)
-                    const container = document.querySelector('.container');
+                    const container = document.body;
                     const buttons = document.getElementById('action-buttons');
                     
                     // 버튼 숨기기
@@ -1170,11 +1170,7 @@ app.get('/', (c) => {
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: '#ffffff',
-                        logging: false,
-                        scrollY: -window.scrollY,
-                        scrollX: -window.scrollX,
-                        windowWidth: container.scrollWidth,
-                        windowHeight: container.scrollHeight
+                        logging: false
                     });
                     
                     // 버튼 다시 표시
@@ -1184,8 +1180,8 @@ app.get('/', (c) => {
                     const imageData = canvas.toDataURL('image/jpeg', 0.95);
                     
                     // 파일명 생성
-                    const vehicleVin = document.getElementById('vehicleVin').value;
-                    const installDate = document.getElementById('installDate').value;
+                    const vehicleVin = document.getElementById('vehicleVin').value || '차량';
+                    const installDate = document.getElementById('installDate').value || new Date().toISOString().split('T')[0];
                     const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.jpg';
                     
                     // 다운로드
