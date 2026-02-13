@@ -430,11 +430,11 @@ app.get('/', (c) => {
                     📧 이메일 발송
                 </button>
                 
-                <!-- JPG Download Button -->
-                <button id="jpgBtn" onclick="downloadJPG()" 
+                <!-- PNG Download Button -->
+                <button id="pngBtn" onclick="downloadJPG()" 
                     class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
                     <i class="fas fa-image mr-2"></i>
-                    📸 JPG 이미지 다운로드
+                    🖼️ PNG 이미지 다운로드
                 </button>
             </div>
 
@@ -1175,14 +1175,15 @@ app.get('/', (c) => {
                     
                     // html2canvas로 전체 페이지 캡처
                     // 디바이스의 픽셀 비율 고려 (Retina 디스플레이 등)
+                    // 최고 품질을 위한 설정: PNG 무손실 포맷 + 높은 해상도
                     const pixelRatio = window.devicePixelRatio || 1;
-                    const scale = Math.max(3, pixelRatio * 2); // 최소 3배, Retina는 4배 이상
+                    const scale = Math.max(4, pixelRatio * 2.5); // 최소 4배, Retina는 5배 이상
                     
                     const canvas = await html2canvas(container, {
                         scale: scale,
                         useCORS: true,
                         allowTaint: false,
-                        backgroundColor: '#f3f4f6',
+                        backgroundColor: '#ffffff',
                         logging: true,
                         imageTimeout: 15000,
                         removeContainer: true,
@@ -1197,13 +1198,13 @@ app.get('/', (c) => {
                         loadingDiv.classList.add('hidden');
                     }
                     
-                    // Canvas를 고품질 JPG로 변환 (98% 품질)
-                    const imageData = canvas.toDataURL('image/jpeg', 0.98);
+                    // Canvas를 PNG로 변환 (무손실, 100% 품질)
+                    const imageData = canvas.toDataURL('image/png');
                     
                     // 파일명 생성
                     const vehicleVin = document.getElementById('vehicleVin').value || '차량';
                     const installDate = document.getElementById('installDate').value || new Date().toISOString().split('T')[0];
-                    const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.jpg';
+                    const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.png';
                     
                     // 다운로드
                     const link = document.createElement('a');
@@ -1213,11 +1214,11 @@ app.get('/', (c) => {
                     link.click();
                     document.body.removeChild(link);
                     
-                    console.log('✅ JPG 다운로드 완료!');
+                    console.log('✅ PNG 다운로드 완료!');
                     
                 } catch (error) {
-                    console.error('❌ JPG 생성 오류:', error);
-                    alert('JPG 생성 중 오류가 발생했습니다: ' + error.message);
+                    console.error('❌ PNG 생성 오류:', error);
+                    alert('PNG 생성 중 오류가 발생했습니다: ' + error.message);
                     const loadingOverlay = document.getElementById('loadingOverlay');
                     if (loadingOverlay) {
                         loadingOverlay.style.display = '';
