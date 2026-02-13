@@ -405,7 +405,7 @@ var xt=Object.defineProperty;var _e=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
             </div>
 
             <!-- Action Buttons -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="action-buttons" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <!-- Email Submit Button -->
                 <button id="emailBtn" onclick="submitEmail()" 
                     class="w-full bg-blue-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
@@ -1126,7 +1126,7 @@ var xt=Object.defineProperty;var _e=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
             };
 
 
-            // 📄 PDF 다운로드 버튼
+            // 📄 JPG 다운로드 버튼
             window.downloadJPG = async function() {
                 console.log('✅ downloadJPG 함수 호출됨');
                 const formData = window.validateForm();
@@ -1142,7 +1142,7 @@ var xt=Object.defineProperty;var _e=e=>{throw TypeError(e)};var bt=(e,t,s)=>t in
                     
                     // 전체 페이지 캡처 (버튼 제외)
                     const container = document.querySelector('.container');
-                    const buttons = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.gap-4.mb-6');
+                    const buttons = document.getElementById('action-buttons');
                     
                     // 버튼 숨기기
                     if (buttons) buttons.style.display = 'none';
