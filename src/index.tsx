@@ -1174,14 +1174,20 @@ app.get('/', (c) => {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     
                     // html2canvas로 전체 페이지 캡처
+                    // 디바이스의 픽셀 비율 고려 (Retina 디스플레이 등)
+                    const pixelRatio = window.devicePixelRatio || 1;
+                    const scale = Math.max(3, pixelRatio * 2); // 최소 3배, Retina는 4배 이상
+                    
                     const canvas = await html2canvas(container, {
-                        scale: 2,
+                        scale: scale,
                         useCORS: true,
                         allowTaint: false,
                         backgroundColor: '#f3f4f6',
                         logging: true,
                         imageTimeout: 15000,
-                        removeContainer: true
+                        removeContainer: true,
+                        windowWidth: container.scrollWidth,
+                        windowHeight: container.scrollHeight
                     });
                     
                     // 버튼과 로딩 오버레이 다시 표시
@@ -1191,8 +1197,8 @@ app.get('/', (c) => {
                         loadingDiv.classList.add('hidden');
                     }
                     
-                    // Canvas를 JPG로 변환
-                    const imageData = canvas.toDataURL('image/jpeg', 0.95);
+                    // Canvas를 고품질 JPG로 변환 (98% 품질)
+                    const imageData = canvas.toDataURL('image/jpeg', 0.98);
                     
                     // 파일명 생성
                     const vehicleVin = document.getElementById('vehicleVin').value || '차량';
