@@ -185,6 +185,15 @@ app.get('/', (c) => {
                             placeholder="차대번호를 입력하세요" required>
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">주행거리 (km)</label>
+                        <input type="number" id="mileage" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="주행거리를 입력하세요 (예: 50000)" 
+                            min="0" 
+                            step="1" 
+                            required>
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">제품 시공명 (해당 항목 체크)</label>
                         
                         <!-- 좌우 2단 레이아웃 -->
@@ -760,6 +769,7 @@ app.get('/', (c) => {
                     // 데이터 수집
                     const installDate = document.getElementById('installDate').value;
                     const vehicleVin = document.getElementById('vehicleVin').value;
+                    const mileage = document.getElementById('mileage').value;
                     const selectedProducts = [];
                     document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
                         selectedProducts.push(cb.value);
@@ -773,7 +783,7 @@ app.get('/', (c) => {
                     const installerName = document.getElementById('installerName').value;
                     const customerName = document.getElementById('customerName').value;
                     
-                    console.log('📊 수집된 데이터:', { installDate, vehicleVin, productName });
+                    console.log('📊 수집된 데이터:', { installDate, vehicleVin, mileage, productName });
                     
                     // 체크리스트 데이터
                     const sections = [
@@ -857,6 +867,9 @@ app.get('/', (c) => {
                     pdfHTML += '<tr style="border-bottom: 1px solid #ddd;">';
                     pdfHTML += '<td style="padding: 12px; font-weight: bold; color: #444;">차대번호:</td>';
                     pdfHTML += '<td style="padding: 12px;">' + vehicleVin + '</td></tr>';
+                    pdfHTML += '<tr style="border-bottom: 1px solid #ddd;">';
+                    pdfHTML += '<td style="padding: 12px; font-weight: bold; color: #444;">주행거리:</td>';
+                    pdfHTML += '<td style="padding: 12px;">' + Number(mileage).toLocaleString() + ' km</td></tr>';
                     pdfHTML += '<tr style="border-bottom: 1px solid #ddd;">';
                     pdfHTML += '<td style="padding: 12px; font-weight: bold; color: #444;">제품명:</td>';
                     pdfHTML += '<td style="padding: 12px;">' + productName + '</td></tr>';
@@ -999,6 +1012,7 @@ app.get('/', (c) => {
             window.validateForm = function() {
                 const installDate = document.getElementById('installDate').value;
                 const vehicleVin = document.getElementById('vehicleVin').value;
+                const mileage = document.getElementById('mileage').value;
                 
                 // Collect selected products
                 const selectedProducts = [];
@@ -1017,7 +1031,7 @@ app.get('/', (c) => {
                 const customerName = document.getElementById('customerName').value;
                 const customerEmail1 = document.getElementById('customerEmail1').value.trim();
 
-                if (!installDate || !vehicleVin || !productName || 
+                if (!installDate || !vehicleVin || !mileage || !productName || 
                     !installerName || !customerName || !customerEmail1) {
                     alert('모든 필수 항목을 입력해주세요.\\n제품 시공명은 최소 1개 이상 선택해야 합니다.');
                     return null;
@@ -1037,6 +1051,7 @@ app.get('/', (c) => {
                 return {
                     installDate,
                     vehicleVin,
+                    mileage,
                     productName,
                     installerName,
                     customerName,
