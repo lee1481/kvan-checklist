@@ -1157,20 +1157,31 @@ app.get('/', (c) => {
                     const loadingOverlay = document.getElementById('loadingOverlay');
                     loadingOverlay.classList.remove('hidden');
                     
-                    // 전체 페이지 캡처 (버튼 제외)
-                    const container = document.body;
+                    // 메인 콘텐츠 영역 캡처
+                    const container = document.getElementById('app');
                     const buttons = document.getElementById('action-buttons');
+                    
+                    if (!container) {
+                        throw new Error('콘텐츠 영역을 찾을 수 없습니다.');
+                    }
                     
                     // 버튼 숨기기
                     if (buttons) buttons.style.display = 'none';
+                    
+                    // 잠시 대기 (DOM 렌더링 완료)
+                    await new Promise(resolve => setTimeout(resolve, 100));
                     
                     // html2canvas로 전체 페이지 캡처
                     const canvas = await html2canvas(container, {
                         scale: 2,
                         useCORS: true,
                         allowTaint: true,
-                        backgroundColor: '#ffffff',
-                        logging: false
+                        backgroundColor: '#f3f4f6',
+                        logging: false,
+                        width: container.scrollWidth,
+                        height: container.scrollHeight,
+                        windowWidth: container.scrollWidth,
+                        windowHeight: container.scrollHeight
                     });
                     
                     // 버튼 다시 표시
@@ -1199,7 +1210,9 @@ app.get('/', (c) => {
                     console.error('❌ JPG 생성 오류:', error);
                     alert('JPG 생성 중 오류가 발생했습니다: ' + error.message);
                     const loadingOverlay = document.getElementById('loadingOverlay');
-                    loadingOverlay.classList.add('hidden');
+                    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                    const buttons = document.getElementById('action-buttons');
+                    if (buttons) buttons.style.display = '';
                 }
             };
 
