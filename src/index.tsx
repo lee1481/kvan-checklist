@@ -176,13 +176,13 @@ app.get('/', (c) => {
                         <label class="block text-sm font-medium text-gray-700 mb-1">시공일자</label>
                         <input type="date" id="installDate" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            required>
+                           >
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">차량 차대번호</label>
                         <input type="text" id="vehicleVin" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="차대번호를 입력하세요" required>
+                            placeholder="차대번호를 입력하세요">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">주행거리 (km)</label>
@@ -191,7 +191,7 @@ app.get('/', (c) => {
                             placeholder="주행거리를 입력하세요 (예: 50000)" 
                             min="0" 
                             step="1" 
-                            required>
+                           >
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">제품 시공명 (해당 항목 체크)</label>
@@ -359,7 +359,7 @@ app.get('/', (c) => {
                         <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
                         <input type="text" id="installerName" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="시공자 이름" required>
+                            placeholder="시공자 이름">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">서명</label>
@@ -380,13 +380,13 @@ app.get('/', (c) => {
                         <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
                         <input type="text" id="customerName" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="고객 이름" required>
+                            placeholder="고객 이름">
                     </div>
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 1 (필수)</label>
                         <input type="email" id="customerEmail1" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="example@email.com" required>
+                            placeholder="example@email.com">
                     </div>
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소 2 (선택)</label>
@@ -1008,7 +1008,7 @@ app.get('/', (c) => {
             };
 
 
-            // 공통 검증 함수
+            // 공통 검증 함수 (필수 검증 제거)
             window.validateForm = function() {
                 const installDate = document.getElementById('installDate').value;
                 const vehicleVin = document.getElementById('vehicleVin').value;
@@ -1031,23 +1031,7 @@ app.get('/', (c) => {
                 const customerName = document.getElementById('customerName').value;
                 const customerEmail1 = document.getElementById('customerEmail1').value.trim();
 
-                if (!installDate || !vehicleVin || !mileage || !productName || 
-                    !installerName || !customerName || !customerEmail1) {
-                    alert('모든 필수 항목을 입력해주세요.\\n제품 시공명은 최소 1개 이상 선택해야 합니다.');
-                    return null;
-                }
-                
-                // Check signatures
-                if (isSignatureEmpty(canvases.installer)) {
-                    alert('시공자 서명을 해주세요.');
-                    return null;
-                }
-                
-                if (isSignatureEmpty(canvases.customer)) {
-                    alert('고객 서명을 해주세요.');
-                    return null;
-                }
-                
+                // 필수 검증 제거 - 모든 데이터 반환
                 return {
                     installDate,
                     vehicleVin,
