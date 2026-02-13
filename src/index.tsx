@@ -988,6 +988,74 @@ app.get('/', (c) => {
                     if (buttons) buttons.style.display = 'none';
                     if (loadingDiv) loadingDiv.style.display = 'none';
                     
+                    // A4 사이즈에 맞게 스타일 조정 (794px × 1123px @96dpi)
+                    const originalStyles = {
+                        maxWidth: container.style.maxWidth,
+                        padding: container.style.padding,
+                        fontSize: document.body.style.fontSize
+                    };
+                    
+                    // A4 비율에 맞게 컨테이너 크기 조정
+                    container.style.maxWidth = '794px';
+                    container.style.padding = '20px';
+                    document.body.style.fontSize = '11px'; // 작은 폰트로 전체 내용이 들어가도록
+                    
+                    // 모든 섹션의 패딩과 마진 축소
+                    const sections = container.querySelectorAll('.section-card, .bg-white');
+                    const sectionOriginalStyles = [];
+                    sections.forEach(section => {
+                        sectionOriginalStyles.push({
+                            element: section,
+                            padding: section.style.padding,
+                            margin: section.style.marginBottom
+                        });
+                        section.style.padding = '12px';
+                        section.style.marginBottom = '12px';
+                    });
+                    
+                    // 제목 폰트 크기 축소
+                    const headings = container.querySelectorAll('h1, h2, h3, h4');
+                    const headingOriginalStyles = [];
+                    headings.forEach(heading => {
+                        headingOriginalStyles.push({
+                            element: heading,
+                            fontSize: heading.style.fontSize,
+                            marginBottom: heading.style.marginBottom
+                        });
+                        const currentSize = window.getComputedStyle(heading).fontSize;
+                        heading.style.fontSize = (parseFloat(currentSize) * 0.7) + 'px';
+                        heading.style.marginBottom = '8px';
+                    });
+                    
+                    // 입력란과 텍스트 크기 축소
+                    const inputs = container.querySelectorAll('input, label, p, span, div');
+                    const inputOriginalStyles = [];
+                    inputs.forEach(input => {
+                        inputOriginalStyles.push({
+                            element: input,
+                            fontSize: input.style.fontSize,
+                            padding: input.style.padding
+                        });
+                        const currentSize = window.getComputedStyle(input).fontSize;
+                        if (parseFloat(currentSize) > 12) {
+                            input.style.fontSize = '11px';
+                        }
+                        if (input.tagName === 'INPUT') {
+                            input.style.padding = '6px 8px';
+                        }
+                    });
+                    
+                    // 서명 캔버스 크기 축소
+                    const signatures = container.querySelectorAll('canvas');
+                    const signatureOriginalStyles = [];
+                    signatures.forEach(sig => {
+                        signatureOriginalStyles.push({
+                            element: sig,
+                            height: sig.style.height
+                        });
+                        sig.style.height = '80px';
+                    });
+                    
                     // 모든 요소의 가시성 강제 적용
                     const allElements = container.querySelectorAll('*');
                     allElements.forEach(el => {
@@ -1021,22 +1089,41 @@ app.get('/', (c) => {
                         })
                     );
                     
-                    // html2canvas로 전체 페이지 캡처
-                    // 디바이스의 픽셀 비율 고려 (Retina 디스플레이 등)
-                    // 최고 품질을 위한 설정: PNG 무손실 포맷 + 높은 해상도
-                    const pixelRatio = window.devicePixelRatio || 1;
-                    const scale = Math.max(4, pixelRatio * 2.5); // 최소 4배, Retina는 5배 이상
-                    
+                    // html2canvas로 A4 사이즈 캡처
                     const canvas = await html2canvas(container, {
-                        scale: scale,
+                        scale: 3, // A4 사이즈에 맞게 적절한 해상도
                         useCORS: true,
                         allowTaint: false,
                         backgroundColor: '#ffffff',
                         logging: true,
                         imageTimeout: 15000,
                         removeContainer: true,
-                        windowWidth: container.scrollWidth,
-                        windowHeight: container.scrollHeight
+                        width: 794, // A4 width @96dpi
+                        height: 1123 // A4 height @96dpi
+                    });
+                    
+                    // 원래 스타일로 복원
+                    container.style.maxWidth = originalStyles.maxWidth;
+                    container.style.padding = originalStyles.padding;
+                    document.body.style.fontSize = originalStyles.fontSize;
+                    
+                    sectionOriginalStyles.forEach(style => {
+                        style.element.style.padding = style.padding;
+                        style.element.style.marginBottom = style.margin;
+                    });
+                    
+                    headingOriginalStyles.forEach(style => {
+                        style.element.style.fontSize = style.fontSize;
+                        style.element.style.marginBottom = style.marginBottom;
+                    });
+                    
+                    inputOriginalStyles.forEach(style => {
+                        style.element.style.fontSize = style.fontSize;
+                        style.element.style.padding = style.padding;
+                    });
+                    
+                    signatureOriginalStyles.forEach(style => {
+                        style.element.style.height = style.height;
                     });
                     
                     // 버튼과 로딩 오버레이 다시 표시
