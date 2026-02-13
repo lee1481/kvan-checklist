@@ -338,7 +338,7 @@ app.get('/', (c) => {
                             </div>
                             <div class="text-gray-600">
                                 <i class="fas fa-building mr-2 text-blue-600"></i>
-                                <strong class="text-blue-900">케이밴 경북지사</strong>
+                                <strong class="text-blue-900">(주)케이밴</strong>
                             </div>
                         </div>
                     </div>
@@ -1416,7 +1416,7 @@ app.post('/api/submit', async (c) => {
       // Send email using Resend REST API
       console.log('📤 Sending email via Resend REST API...')
       
-      const fromName = FROM_NAME || '케이밴 경북지사'
+      const fromName = FROM_NAME || '(주)케이밴'
       const fromEmail = FROM_EMAIL || 'noreply@yourdomain.com'
       const emailSubject = '케이밴 제품 시공 점검표 - ' + data.vehicleVin
       
