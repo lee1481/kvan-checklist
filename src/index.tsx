@@ -988,19 +988,20 @@ app.get('/', (c) => {
                     if (buttons) buttons.style.display = 'none';
                     if (loadingDiv) loadingDiv.style.display = 'none';
                     
-                    // A4 사이즈에 맞게 스타일 조정 (794px × 1123px @96dpi)
+                    // A4 사이즈에 맞게 스타일 조정하되, 콘텐츠 크기는 자연스럽게 유지
                     const originalStyles = {
                         maxWidth: container.style.maxWidth,
                         padding: container.style.padding,
-                        fontSize: document.body.style.fontSize
+                        fontSize: document.body.style.fontSize,
+                        width: container.style.width
                     };
                     
-                    // A4 비율에 맞게 컨테이너 크기 조정
-                    container.style.maxWidth = '794px';
-                    container.style.padding = '20px';
-                    document.body.style.fontSize = '11px'; // 작은 폰트로 전체 내용이 들어가도록
+                    // 컨테이너를 A4 너비에 맞게 조정 (자연스러운 높이 유지)
+                    container.style.maxWidth = '800px';
+                    container.style.width = '800px';
+                    container.style.padding = '30px';
                     
-                    // 모든 섹션의 패딩과 마진 축소
+                    // 모든 섹션의 패딩과 마진을 적당히 축소
                     const sections = container.querySelectorAll('.section-card, .bg-white');
                     const sectionOriginalStyles = [];
                     sections.forEach(section => {
@@ -1009,11 +1010,11 @@ app.get('/', (c) => {
                             padding: section.style.padding,
                             margin: section.style.marginBottom
                         });
-                        section.style.padding = '12px';
-                        section.style.marginBottom = '12px';
+                        section.style.padding = '16px';
+                        section.style.marginBottom = '16px';
                     });
                     
-                    // 제목 폰트 크기 축소
+                    // 제목 폰트 크기를 약간만 축소
                     const headings = container.querySelectorAll('h1, h2, h3, h4');
                     const headingOriginalStyles = [];
                     headings.forEach(heading => {
@@ -1023,12 +1024,12 @@ app.get('/', (c) => {
                             marginBottom: heading.style.marginBottom
                         });
                         const currentSize = window.getComputedStyle(heading).fontSize;
-                        heading.style.fontSize = (parseFloat(currentSize) * 0.7) + 'px';
-                        heading.style.marginBottom = '8px';
+                        heading.style.fontSize = (parseFloat(currentSize) * 0.85) + 'px';
+                        heading.style.marginBottom = '10px';
                     });
                     
-                    // 입력란과 텍스트 크기 축소
-                    const inputs = container.querySelectorAll('input, label, p, span, div');
+                    // 입력란과 텍스트를 읽기 좋은 크기로 유지
+                    const inputs = container.querySelectorAll('input, label, p, span');
                     const inputOriginalStyles = [];
                     inputs.forEach(input => {
                         inputOriginalStyles.push({
@@ -1037,15 +1038,15 @@ app.get('/', (c) => {
                             padding: input.style.padding
                         });
                         const currentSize = window.getComputedStyle(input).fontSize;
-                        if (parseFloat(currentSize) > 12) {
-                            input.style.fontSize = '11px';
+                        if (parseFloat(currentSize) > 14) {
+                            input.style.fontSize = '13px';
                         }
                         if (input.tagName === 'INPUT') {
-                            input.style.padding = '6px 8px';
+                            input.style.padding = '8px 10px';
                         }
                     });
                     
-                    // 서명 캔버스 크기 축소
+                    // 서명 캔버스 크기를 적당히 축소
                     const signatures = container.querySelectorAll('canvas');
                     const signatureOriginalStyles = [];
                     signatures.forEach(sig => {
@@ -1053,7 +1054,7 @@ app.get('/', (c) => {
                             element: sig,
                             height: sig.style.height
                         });
-                        sig.style.height = '80px';
+                        sig.style.height = '120px';
                     });
                     
                     // 모든 요소의 가시성 강제 적용
@@ -1089,23 +1090,22 @@ app.get('/', (c) => {
                         })
                     );
                     
-                    // html2canvas로 A4 사이즈 캡처
+                    // html2canvas로 고품질 캡처 (자연스러운 콘텐츠 크기)
                     const canvas = await html2canvas(container, {
-                        scale: 3, // A4 사이즈에 맞게 적절한 해상도
+                        scale: 2.5, // 높은 해상도 유지
                         useCORS: true,
                         allowTaint: false,
                         backgroundColor: '#ffffff',
                         logging: true,
                         imageTimeout: 15000,
-                        removeContainer: true,
-                        width: 794, // A4 width @96dpi
-                        height: 1123 // A4 height @96dpi
+                        removeContainer: true
+                        // width/height를 지정하지 않아 자연스러운 크기 유지
                     });
                     
                     // 원래 스타일로 복원
                     container.style.maxWidth = originalStyles.maxWidth;
+                    container.style.width = originalStyles.width;
                     container.style.padding = originalStyles.padding;
-                    document.body.style.fontSize = originalStyles.fontSize;
                     
                     sectionOriginalStyles.forEach(style => {
                         style.element.style.padding = style.padding;
