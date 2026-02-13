@@ -329,6 +329,12 @@ app.get('/', (c) => {
                             placeholder="고객 이름">
                     </div>
                     <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
+                        <input type="tel" id="customerPhone" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            placeholder="010-1234-5678">
+                    </div>
+                    <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
                         <input type="email" id="customerEmail1" 
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
@@ -836,6 +842,7 @@ app.get('/', (c) => {
                 const productName = selectedProducts.join(', ');
                 const installerName = document.getElementById('installerName').value;
                 const customerName = document.getElementById('customerName').value;
+                const customerPhone = document.getElementById('customerPhone').value.trim();
                 const customerEmail1 = document.getElementById('customerEmail1').value.trim();
 
                 // 필수 검증 제거 - 모든 데이터 반환
@@ -846,6 +853,7 @@ app.get('/', (c) => {
                     productName,
                     installerName,
                     customerName,
+                    customerPhone,
                     customerEmail1
                 };
             }
@@ -909,10 +917,12 @@ app.get('/', (c) => {
                     const response = await axios.post('/api/submit', {
                         installDate: formData.installDate,
                         vehicleVin: formData.vehicleVin,
+                        mileage: formData.mileage,
                         productName: formData.productName,
                         productConfig: formData.productName,
                         installerName: formData.installerName,
                         customerName: formData.customerName,
+                        customerPhone: formData.customerPhone,
                         customerEmail: formData.customerEmail1,
                         emailList,
                         checklist,
