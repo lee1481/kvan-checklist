@@ -430,11 +430,11 @@ app.get('/', (c) => {
                     📧 이메일 발송
                 </button>
                 
-                <!-- PDF Download Button -->
-                <button id="pdfBtn" onclick="downloadPDF()" 
+                <!-- JPG Download Button -->
+                <button id="jpgBtn" onclick="downloadJPG()" 
                     class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
-                    <i class="fas fa-file-pdf mr-2"></i>
-                    📄 PDF 다운로드
+                    <i class="fas fa-image mr-2"></i>
+                    📸 JPG 이미지 다운로드
                 </button>
             </div>
 
@@ -1160,17 +1160,67 @@ app.get('/', (c) => {
 
 
             // 📄 PDF 다운로드 버튼
-            window.downloadPDF = async function() {
-                console.log('✅ downloadPDF 함수 호출됨');
+            window.downloadJPG = async function() {
+                console.log('✅ downloadJPG 함수 호출됨');
                 const formData = window.validateForm();
                 if (!formData) {
                     console.log('❌ validateForm 실패');
                     return;
                 }
-                console.log('✅ validateForm 통과, PDF 생성 시작');
+                console.log('✅ validateForm 통과, JPG 생성 시작');
                 
-                // PDF 생성
-                await window.generatePDF();
+                try {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.classList.remove('hidden');
+                    
+                    // 전체 페이지 캡처 (버튼 제외)
+                    const container = document.querySelector('.container');
+                    const buttons = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.gap-4.mb-6');
+                    
+                    // 버튼 숨기기
+                    if (buttons) buttons.style.display = 'none';
+                    
+                    // html2canvas로 전체 페이지 캡처
+                    const canvas = await html2canvas(container, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        scrollY: -window.scrollY,
+                        scrollX: -window.scrollX,
+                        windowWidth: container.scrollWidth,
+                        windowHeight: container.scrollHeight
+                    });
+                    
+                    // 버튼 다시 표시
+                    if (buttons) buttons.style.display = '';
+                    
+                    // Canvas를 JPG로 변환
+                    const imageData = canvas.toDataURL('image/jpeg', 0.95);
+                    
+                    // 파일명 생성
+                    const vehicleVin = document.getElementById('vehicleVin').value;
+                    const installDate = document.getElementById('installDate').value;
+                    const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.jpg';
+                    
+                    // 다운로드
+                    const link = document.createElement('a');
+                    link.href = imageData;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    loadingOverlay.classList.add('hidden');
+                    console.log('✅ JPG 다운로드 완료!');
+                    
+                } catch (error) {
+                    console.error('❌ JPG 생성 오류:', error);
+                    alert('JPG 생성 중 오류가 발생했습니다: ' + error.message);
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.classList.add('hidden');
+                }
             };
 
 
