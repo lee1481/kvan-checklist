@@ -1166,12 +1166,45 @@ app.get('/', (c) => {
                         throw new Error('콘텐츠 영역을 찾을 수 없습니다.');
                     }
                     
+                    // 스크롤을 최상단으로 이동
+                    window.scrollTo(0, 0);
+                    
                     // 버튼과 로딩 오버레이 숨기기
                     if (buttons) buttons.style.display = 'none';
                     if (loadingDiv) loadingDiv.style.display = 'none';
                     
-                    // DOM 렌더링 완료 대기
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // 모든 요소의 가시성 강제 적용
+                    const allElements = container.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        const computed = window.getComputedStyle(el);
+                        if (computed.visibility === 'hidden' && !el.classList.contains('hidden')) {
+                            el.style.visibility = 'visible';
+                        }
+                        if (computed.opacity === '0' && !el.classList.contains('hidden')) {
+                            el.style.opacity = '1';
+                        }
+                    });
+                    
+                    // 폰트 로딩 대기
+                    if (document.fonts && document.fonts.ready) {
+                        await document.fonts.ready;
+                    }
+                    
+                    // DOM 렌더링 완료 대기 (1초)
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // 이미지 로딩 완료 대기
+                    const images = container.querySelectorAll('img');
+                    await Promise.all(
+                        Array.from(images).map(img => {
+                            if (img.complete) return Promise.resolve();
+                            return new Promise(resolve => {
+                                img.onload = resolve;
+                                img.onerror = resolve;
+                                setTimeout(resolve, 3000); // 3초 타임아웃
+                            });
+                        })
+                    );
                     
                     // html2canvas로 전체 페이지 캡처
                     // 디바이스의 픽셀 비율 고려 (Retina 디스플레이 등)
