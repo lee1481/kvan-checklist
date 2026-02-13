@@ -260,6 +260,73 @@ app.get('/', (c) => {
             <!-- Checklist Sections -->
             <div id="checklist-container"></div>
 
+            <!-- Warranty Certificate Section -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-8 mb-6 section-card border-4 border-blue-400">
+                <h2 class="text-3xl font-bold text-blue-900 mb-6 flex items-center justify-center">
+                    <i class="fas fa-certificate mr-3"></i>
+                    보증서 (소)
+                </h2>
+                
+                <div class="bg-white rounded-lg p-6 shadow-inner">
+                    <div class="space-y-5 text-gray-800">
+                        <div class="flex items-start">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">1</span>
+                            <p class="text-xl leading-relaxed pt-1">
+                                중고자동차 매매계약서 상의 <strong class="text-blue-700">하자담보책임 기간 내에 발생한 문제</strong>에 대하여 보상하며,
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">2</span>
+                            <p class="text-xl leading-relaxed pt-1">
+                                착수일로부터 <strong class="text-blue-700">60일 이내</strong>에 기술자가 발견 및 확인한 하자에 대해서는 보상 지급합니다.
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">3</span>
+                            <p class="text-xl leading-relaxed pt-1">
+                                그러한 하자가 발생 시, <strong class="text-blue-700">최대한 신속하게 수리</strong>를 의뢰된 자에게 전달하여 주시기 바랍니다.
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white font-bold text-lg mr-4 flex-shrink-0">4</span>
+                            <p class="text-xl leading-relaxed pt-1">
+                                <strong class="text-red-700">고객의 과실로 발생된 하자와 자연발생 하자</strong>는 보상대상에서 제외됩니다.
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white font-bold text-lg mr-4 flex-shrink-0">5</span>
+                            <p class="text-xl leading-relaxed pt-1">
+                                고객의 요구에 의해 <strong class="text-red-700">추가적인 수리를 받은 경우</strong>라 하더라도 보상을 해 드리지 않습니다.
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">6</span>
+                            <p class="text-xl leading-relaxed pt-1">
+                                본 보증서는 <strong class="text-blue-700">대한민국 내에서만 유효</strong>합니다.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t-2 border-gray-200">
+                        <div class="flex justify-between items-center text-lg">
+                            <div class="text-gray-600">
+                                <i class="fas fa-phone-alt mr-2 text-blue-600"></i>
+                                문의: <strong class="text-gray-800">031-666-1901</strong> / <strong class="text-gray-800">010-3271-1900</strong>
+                            </div>
+                            <div class="text-gray-600">
+                                <i class="fas fa-building mr-2 text-blue-600"></i>
+                                <strong class="text-blue-900">케이밴 경북지사</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Signature Section -->
             <div class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card">
                 <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
