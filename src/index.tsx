@@ -264,7 +264,7 @@ app.get('/', (c) => {
             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-8 mb-6 section-card border-4 border-blue-400">
                 <h2 class="text-3xl font-bold text-blue-900 mb-6 flex items-center justify-center">
                     <i class="fas fa-certificate mr-3"></i>
-                    보증서 (소)
+                    품질보증서
                 </h2>
                 
                 <div class="bg-white rounded-lg p-6 shadow-inner">
@@ -272,43 +272,52 @@ app.get('/', (c) => {
                         <div class="flex items-start">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">1</span>
                             <p class="text-xl leading-relaxed pt-1">
-                                중고자동차 매매계약서 상의 <strong class="text-blue-700">하자담보책임 기간 내에 발생한 문제</strong>에 대하여 보상하며,
+                                케이밴 제품의 보상 기준은 <strong class="text-blue-700">공정거래위원회 소비자 분쟁 해결 기준</strong>에 따릅니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">2</span>
                             <p class="text-xl leading-relaxed pt-1">
-                                착수일로부터 <strong class="text-blue-700">60일 이내</strong>에 기술자가 발견 및 확인한 하자에 대해서는 보상 지급합니다.
+                                본 제품은 <strong class="text-blue-700">엄격한 품질관리 및 검사 과정</strong>을 거쳐서 만들어진 제품입니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">3</span>
                             <p class="text-xl leading-relaxed pt-1">
-                                그러한 하자가 발생 시, <strong class="text-blue-700">최대한 신속하게 수리</strong>를 의뢰된 자에게 전달하여 주시기 바랍니다.
+                                보증 기간 중 고객이 정상적으로 사용하는 과정에서 제품상의 결함으로 인해 발생한 고장의 경우, <strong class="text-blue-700">무상 수리</strong>를 제공합니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white font-bold text-lg mr-4 flex-shrink-0">4</span>
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">4</span>
                             <p class="text-xl leading-relaxed pt-1">
-                                <strong class="text-red-700">고객의 과실로 발생된 하자와 자연발생 하자</strong>는 보상대상에서 제외됩니다.
+                                서비스를 받으실 때 <strong class="text-blue-700">본 보증서를 제시</strong>하여 주십시오.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white font-bold text-lg mr-4 flex-shrink-0">5</span>
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white font-bold text-lg mr-4 flex-shrink-0">5</span>
                             <p class="text-xl leading-relaxed pt-1">
-                                고객의 요구에 의해 <strong class="text-red-700">추가적인 수리를 받은 경우</strong>라 하더라도 보상을 해 드리지 않습니다.
+                                본 제품의 보증 기간은 <strong class="text-green-700">3년 6만 킬로미터</strong>로 규정합니다.
                             </p>
                         </div>
                         
-                        <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">6</span>
-                            <p class="text-xl leading-relaxed pt-1">
-                                본 보증서는 <strong class="text-blue-700">대한민국 내에서만 유효</strong>합니다.
+                        <div class="mt-6 p-4 bg-red-50 rounded-lg border-2 border-red-300">
+                            <p class="text-lg font-bold text-red-800 mb-3">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                다음의 경우는 품질 보증 조건에 해당되지 않으므로 유상 수리로 적용됩니다.
                             </p>
+                            <div class="space-y-2 text-base text-gray-700 ml-4">
+                                <p><strong>가.</strong> 소비자의 고의 또는 과실로 인하여 발생된 피해의 경우.</p>
+                                <p><strong>나.</strong> 당사의 서비스 기사가 아닌 자가 제품의 구조, 기능을 개조 또는 이동, 변조하여 발생된 고장.</p>
+                                <p><strong>다.</strong> 제품 사용 중 발생되는 생활 스크래치 및 변형, 변색.</p>
+                                <p><strong>라.</strong> 제품의 사용 방법 숙지 부족으로 인한 제품의 파손, 재설치와 관련된 사항.</p>
+                                <p><strong>마.</strong> 차량 운행 중 발생할 수 있는 각종 사고로 인해 제품의 고장 또는 결함이 발생한 경우.</p>
+                                <p><strong>바.</strong> 천재지변에 의한 제품의 고장 또는 결함의 경우.</p>
+                                <p><strong>사.</strong> 무상 보증기간이 도래된 경우.</p>
+                            </div>
                         </div>
                     </div>
                     
