@@ -1160,32 +1160,36 @@ app.get('/', (c) => {
                     // 메인 콘텐츠 영역 캡처
                     const container = document.getElementById('app');
                     const buttons = document.getElementById('action-buttons');
+                    const loadingDiv = document.getElementById('loadingOverlay');
                     
                     if (!container) {
                         throw new Error('콘텐츠 영역을 찾을 수 없습니다.');
                     }
                     
-                    // 버튼 숨기기
+                    // 버튼과 로딩 오버레이 숨기기
                     if (buttons) buttons.style.display = 'none';
+                    if (loadingDiv) loadingDiv.style.display = 'none';
                     
-                    // 잠시 대기 (DOM 렌더링 완료)
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    // DOM 렌더링 완료 대기
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     
                     // html2canvas로 전체 페이지 캡처
                     const canvas = await html2canvas(container, {
                         scale: 2,
                         useCORS: true,
-                        allowTaint: true,
+                        allowTaint: false,
                         backgroundColor: '#f3f4f6',
-                        logging: false,
-                        width: container.scrollWidth,
-                        height: container.scrollHeight,
-                        windowWidth: container.scrollWidth,
-                        windowHeight: container.scrollHeight
+                        logging: true,
+                        imageTimeout: 15000,
+                        removeContainer: true
                     });
                     
-                    // 버튼 다시 표시
+                    // 버튼과 로딩 오버레이 다시 표시
                     if (buttons) buttons.style.display = '';
+                    if (loadingDiv) {
+                        loadingDiv.style.display = '';
+                        loadingDiv.classList.add('hidden');
+                    }
                     
                     // Canvas를 JPG로 변환
                     const imageData = canvas.toDataURL('image/jpeg', 0.95);
@@ -1203,14 +1207,16 @@ app.get('/', (c) => {
                     link.click();
                     document.body.removeChild(link);
                     
-                    loadingOverlay.classList.add('hidden');
                     console.log('✅ JPG 다운로드 완료!');
                     
                 } catch (error) {
                     console.error('❌ JPG 생성 오류:', error);
                     alert('JPG 생성 중 오류가 발생했습니다: ' + error.message);
                     const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = '';
+                        loadingOverlay.classList.add('hidden');
+                    }
                     const buttons = document.getElementById('action-buttons');
                     if (buttons) buttons.style.display = '';
                 }
