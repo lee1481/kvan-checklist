@@ -130,118 +130,120 @@ app.get('/', (c) => {
             </div>
 
             <!-- PAGE 1: 메인 페이지 (A4 사이즈 비율) -->
-            <div id="page1-container" class="a4-page mb-6" style="padding: 40px;">
+            <div id="page1-container" class="a4-page mb-6" style="padding: 30px;">
                 
                 <!-- 시공 정보 -->
-                <div id="main-page" class="bg-white rounded-lg shadow-lg p-6 mb-4 section-card">
-                    <h2 class="text-2xl font-bold text-blue-900 mb-4 flex items-center">
-                        <i class="fas fa-info-circle mr-3"></i>
+                <div id="main-page" class="bg-white rounded-lg shadow-lg p-5 mb-3 section-card">
+                    <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
                         시공 정보
                     </h2>
-                    <div class="space-y-4">
-                    <!-- 시공일자 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">시공일자</label>
-                        <input type="date" id="installDate" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base">
-                    </div>
-                    
-                    <!-- 고객명 + 고객 서명 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">고객명</label>
-                        <input type="text" id="customerName" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
-                            placeholder="고객 이름">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">고객 서명</label>
-                        <canvas id="customerSignature" 
-                            class="signature-canvas w-full" 
-                            width="600" height="120"></canvas>
-                        <button onclick="clearSignature('customer')" 
-                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
-                            <i class="fas fa-eraser mr-1"></i> 지우기
-                        </button>
-                    </div>
-                    
-                    <!-- 고객 전화번호 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">고객 전화번호</label>
-                        <input type="tel" id="customerPhone" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
-                            placeholder="010-1234-5678">
-                    </div>
-                    
-                    <!-- 차량 차대번호 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">차량 차대번호</label>
-                        <input type="text" id="vehicleVin" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
-                            placeholder="차대번호를 입력하세요">
-                    </div>
-                    
-                    <!-- 주행거리 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">주행거리 (km)</label>
-                        <input type="number" id="mileage" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
-                            placeholder="주행거리를 입력하세요 (예: 50000)" 
-                            min="0" 
-                            step="1">
+                    <div class="space-y-3">
+                        <!-- 시공일자 (전체 너비) -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">시공일자</label>
+                            <input type="date" id="installDate" 
+                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm">
+                        </div>
+                        
+                        <!-- 고객명 + 고객 전화번호 (2단) -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">고객명</label>
+                                <input type="text" id="customerName" 
+                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                    placeholder="고객 이름">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">고객 전화번호</label>
+                                <input type="tel" id="customerPhone" 
+                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                    placeholder="010-1234-5678">
+                            </div>
+                        </div>
+                        
+                        <!-- 고객 서명 (전체 너비, 높이 축소) -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">고객 서명</label>
+                            <canvas id="customerSignature" 
+                                class="signature-canvas w-full" 
+                                width="600" height="80"></canvas>
+                            <button onclick="clearSignature('customer')" 
+                                class="mt-1 px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition">
+                                <i class="fas fa-eraser mr-1"></i> 지우기
+                            </button>
+                        </div>
+                        
+                        <!-- 차대번호 + 주행거리 (2단) -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">차량 차대번호</label>
+                                <input type="text" id="vehicleVin" 
+                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                    placeholder="차대번호">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">주행거리 (km)</label>
+                                <input type="number" id="mileage" 
+                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                    placeholder="예: 50000" 
+                                    min="0" 
+                                    step="1">
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
             <!-- 품질보증서 -->
-            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-5 mb-4 section-card border-4 border-blue-400">
-                <h2 class="text-xl font-bold text-blue-900 mb-3 flex items-center justify-center">
-                    <i class="fas fa-certificate mr-3"></i>
+            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg p-4 mb-3 section-card border-2 border-blue-400">
+                <h2 class="text-base font-bold text-blue-900 mb-2 flex items-center justify-center">
+                    <i class="fas fa-certificate mr-2"></i>
                     품질보증서
                 </h2>
                 
-                <div class="bg-white rounded-lg p-4 shadow-inner">
-                    <div class="space-y-2 text-gray-800">
+                <div class="bg-white rounded-lg p-3 shadow-inner">
+                    <div class="space-y-1.5 text-gray-800">
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">1</span>
-                            <p class="text-base leading-relaxed">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">1</span>
+                            <p class="text-xs leading-tight">
                                 케이밴 제품의 보상 기준은 <strong class="text-blue-700">공정거래위원회 소비자 분쟁 해결 기준</strong>에 따릅니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">2</span>
-                            <p class="text-base leading-relaxed">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">2</span>
+                            <p class="text-xs leading-tight">
                                 본 제품은 <strong class="text-blue-700">엄격한 품질관리 및 검사 과정</strong>을 거쳐서 만들어진 제품입니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">3</span>
-                            <p class="text-base leading-relaxed">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">3</span>
+                            <p class="text-xs leading-tight">
                                 보증 기간 중 고객이 정상적으로 사용하는 과정에서 제품상의 결함으로 인해 발생한 고장의 경우, <strong class="text-blue-700">무상 수리</strong>를 제공합니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">4</span>
-                            <p class="text-base leading-relaxed">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">4</span>
+                            <p class="text-xs leading-tight">
                                 서비스를 받으실 때 <strong class="text-blue-700">본 보증서를 제시</strong>하여 주십시오.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold text-sm mr-3 flex-shrink-0">5</span>
-                            <p class="text-base leading-relaxed">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white font-bold text-xs mr-2 flex-shrink-0">5</span>
+                            <p class="text-xs leading-tight">
                                 본 제품의 보증 기간은 <strong class="text-green-700">3년 6만 킬로미터</strong>로 규정합니다.
                             </p>
                         </div>
                         
-                        <div class="mt-4 p-3 bg-red-50 rounded-lg border-2 border-red-300">
-                            <p class="text-sm font-bold text-red-800 mb-2">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div class="mt-2 p-2 bg-red-50 rounded border border-red-300">
+                            <p class="text-xs font-bold text-red-800 mb-1">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
                                 다음의 경우는 품질 보증 조건에 해당되지 않으므로 유상 수리로 적용됩니다.
                             </p>
-                            <div class="space-y-1 text-xs text-gray-700 ml-4">
+                            <div class="space-y-0.5 text-[10px] text-gray-700 ml-3">
                                 <p><strong>가.</strong> 소비자의 고의 또는 과실로 인하여 발생된 피해의 경우.</p>
                                 <p><strong>나.</strong> 당사의 서비스 기사가 아닌 자가 제품의 구조, 기능을 개조 또는 이동, 변조하여 발생된 고장.</p>
                                 <p><strong>다.</strong> 제품 사용 중 발생되는 생활 스크래치 및 변형, 변색.</p>
@@ -253,8 +255,8 @@ app.get('/', (c) => {
                         </div>
                     </div>
                     
-                    <div class="mt-4 pt-4 border-t-2 border-gray-200">
-                        <div class="flex justify-between items-center text-sm">
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <div class="flex justify-between items-center text-[10px]">
                             <div class="text-gray-600">
                                 <i class="fas fa-phone-alt mr-1 text-blue-600"></i>
                                 문의: <strong class="text-gray-800">031-666-1901</strong> / <strong class="text-gray-800">010-3271-1900</strong>
@@ -269,25 +271,25 @@ app.get('/', (c) => {
             </div>
 
             <!-- 시공자 정보 + 서명 -->
-            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-5 mb-4 section-card">
-                <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-4 mb-3 section-card">
+                <h2 class="text-base font-bold text-blue-900 mb-2 flex items-center">
                     <i class="fas fa-user-tie mr-2"></i>
                     시공자 정보
                 </h2>
-                <div class="space-y-3">
+                <div class="space-y-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">시공자명</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">시공자명</label>
                         <input type="text" id="installerName" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
+                            class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
                             placeholder="시공자 이름">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">시공자 서명</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">시공자 서명</label>
                         <canvas id="installerSignature" 
                             class="signature-canvas w-full" 
-                            width="600" height="120"></canvas>
+                            width="600" height="80"></canvas>
                         <button onclick="clearSignature('installer')" 
-                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
+                            class="mt-1 px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition">
                             <i class="fas fa-eraser mr-1"></i> 지우기
                         </button>
                     </div>
@@ -295,30 +297,30 @@ app.get('/', (c) => {
             </div>
 
             <!-- 이메일 입력 + 발송 버튼 -->
-            <div id="email-section" class="bg-white rounded-lg shadow-lg p-5 mb-0 section-card">
-                <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+            <div id="email-section" class="bg-white rounded-lg shadow-lg p-4 mb-0 section-card">
+                <h2 class="text-base font-bold text-blue-900 mb-2 flex items-center">
                     <i class="fas fa-envelope mr-2"></i>
                     이메일 발송 & JPG 다운로드
                 </h2>
-                <div class="space-y-3">
+                <div class="space-y-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">이메일 주소</label>
                         <input type="email" id="customerEmail1" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
+                            class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
                             placeholder="example@email.com">
                     </div>
                     
                     <!-- 버튼 2개: 이메일 발송 + JPG 다운로드 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2">
                         <button id="emailBtn" onclick="submitEmail()" 
-                            class="w-full bg-blue-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
-                            <i class="fas fa-paper-plane mr-2"></i>
+                            class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-1"></i>
                             📧 이메일 발송
                         </button>
                         
                         <button id="jpgBtn" onclick="downloadPage1JPG()" 
-                            class="w-full bg-green-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
-                            <i class="fas fa-camera mr-2"></i>
+                            class="w-full bg-green-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
+                            <i class="fas fa-camera mr-1"></i>
                             📸 JPG 다운로드
                         </button>
                     </div>
