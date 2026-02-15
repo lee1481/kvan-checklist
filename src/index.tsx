@@ -95,6 +95,24 @@ app.get('/', (c) => {
                 border-color: #2c5aa0;
                 box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
             }
+            
+            /* A4 Page 1 Container */
+            .a4-page {
+                width: 794px;
+                min-height: 1123px;
+                max-width: 794px;
+                margin: 0 auto;
+                background: white;
+                box-sizing: border-box;
+            }
+            
+            @media (max-width: 820px) {
+                .a4-page {
+                    width: 100%;
+                    min-height: auto;
+                    max-width: 100%;
+                }
+            }
         </style>
     </head>
     <body class="bg-gray-50">
@@ -111,13 +129,16 @@ app.get('/', (c) => {
                 </div>
             </div>
 
-            <!-- PAGE 1: 메인 페이지 (A4 사이즈) -->
-            <div id="main-page" class="bg-white rounded-lg shadow-lg p-8 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
-                <h2 class="text-2xl font-bold text-blue-900 mb-6 flex items-center">
-                    <i class="fas fa-info-circle mr-3"></i>
-                    시공 정보
-                </h2>
-                <div class="space-y-5">
+            <!-- PAGE 1: 메인 페이지 (A4 사이즈 비율) -->
+            <div id="page1-container" class="a4-page mb-6" style="padding: 40px;">
+                
+                <!-- 시공 정보 -->
+                <div id="main-page" class="bg-white rounded-lg shadow-lg p-6 mb-4 section-card">
+                    <h2 class="text-2xl font-bold text-blue-900 mb-4 flex items-center">
+                        <i class="fas fa-info-circle mr-3"></i>
+                        시공 정보
+                    </h2>
+                    <div class="space-y-4">
                     <!-- 시공일자 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">시공일자</label>
@@ -171,15 +192,15 @@ app.get('/', (c) => {
                 </div>
             </div>
 
-            <!-- 품질보증서 (메인 페이지 하단) -->
-            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-6 mb-6 section-card border-4 border-blue-400" style="max-width: 794px; margin: 0 auto;">
-                <h2 class="text-2xl font-bold text-blue-900 mb-4 flex items-center justify-center">
+            <!-- 품질보증서 -->
+            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-5 mb-4 section-card border-4 border-blue-400">
+                <h2 class="text-xl font-bold text-blue-900 mb-3 flex items-center justify-center">
                     <i class="fas fa-certificate mr-3"></i>
                     품질보증서
                 </h2>
                 
-                <div class="bg-white rounded-lg p-5 shadow-inner">
-                    <div class="space-y-3 text-gray-800">
+                <div class="bg-white rounded-lg p-4 shadow-inner">
+                    <div class="space-y-2 text-gray-800">
                         <div class="flex items-start">
                             <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">1</span>
                             <p class="text-base leading-relaxed">
@@ -248,12 +269,12 @@ app.get('/', (c) => {
             </div>
 
             <!-- 시공자 정보 + 서명 -->
-            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
-                <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-5 mb-4 section-card">
+                <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
                     <i class="fas fa-user-tie mr-2"></i>
                     시공자 정보
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">시공자명</label>
                         <input type="text" id="installerName" 
@@ -274,12 +295,12 @@ app.get('/', (c) => {
             </div>
 
             <!-- 이메일 입력 + 발송 버튼 -->
-            <div id="email-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
-                <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+            <div id="email-section" class="bg-white rounded-lg shadow-lg p-5 mb-0 section-card">
+                <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
                     <i class="fas fa-envelope mr-2"></i>
                     이메일 발송 & JPG 다운로드
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
                         <input type="email" id="customerEmail1" 
@@ -303,6 +324,9 @@ app.get('/', (c) => {
                     </div>
                 </div>
             </div>
+            
+            </div>
+            <!-- END of Page 1 A4 Container -->
 
             <div style="page-break-after: always; margin: 40px 0; border-bottom: 3px dashed #ccc;"></div>
 
@@ -1004,22 +1028,12 @@ app.get('/', (c) => {
                     const loadingOverlay = document.getElementById('loadingOverlay');
                     loadingOverlay.classList.remove('hidden');
                     
-                    // Page 1 영역만 선택 (main-page, warranty-section, installer-section)
-                    const mainPage = document.getElementById('main-page');
-                    const warrantySection = document.getElementById('warranty-section');
-                    const installerSection = document.getElementById('installer-section');
+                    // Page 1 A4 컨테이너 선택
+                    const page1Container = document.getElementById('page1-container');
                     
-                    if (!mainPage || !warrantySection || !installerSection) {
+                    if (!page1Container) {
                         throw new Error('Page 1 영역을 찾을 수 없습니다.');
                     }
-                    
-                    // 임시 컨테이너 생성하여 Page 1 내용만 담기
-                    const tempContainer = document.createElement('div');
-                    tempContainer.style.cssText = 'position: absolute; left: -9999px; top: 0; background: #f3f4f6; padding: 20px;';
-                    tempContainer.appendChild(mainPage.cloneNode(true));
-                    tempContainer.appendChild(warrantySection.cloneNode(true));
-                    tempContainer.appendChild(installerSection.cloneNode(true));
-                    document.body.appendChild(tempContainer);
                     
                     // 스크롤 최상단
                     window.scrollTo(0, 0);
@@ -1030,21 +1044,20 @@ app.get('/', (c) => {
                     }
                     
                     // DOM 렌더링 대기
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 800));
                     
-                    // html2canvas로 고품질 JPG 캡처
-                    const canvas = await html2canvas(tempContainer, {
+                    // html2canvas로 고품질 JPG 캡처 (A4 비율)
+                    const canvas = await html2canvas(page1Container, {
                         scale: 3, // 고품질 (카카오톡용)
                         useCORS: true,
                         allowTaint: false,
-                        backgroundColor: '#f3f4f6',
+                        backgroundColor: '#ffffff',
                         logging: true,
                         imageTimeout: 15000,
-                        removeContainer: false
+                        removeContainer: false,
+                        width: 794,
+                        height: 1123
                     });
-                    
-                    // 임시 컨테이너 제거
-                    document.body.removeChild(tempContainer);
                     
                     // Canvas를 JPG로 변환 (95% 품질)
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
