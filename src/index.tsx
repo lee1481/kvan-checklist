@@ -111,160 +111,116 @@ app.get('/', (c) => {
                 </div>
             </div>
 
-            <!-- Installation Info Form -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card">
-                <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>
+            <!-- PAGE 1: 메인 페이지 (A4 사이즈) -->
+            <div id="main-page" class="bg-white rounded-lg shadow-lg p-8 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
+                <h2 class="text-2xl font-bold text-blue-900 mb-6 flex items-center">
+                    <i class="fas fa-info-circle mr-3"></i>
                     시공 정보
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-5">
+                    <!-- 시공일자 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">시공일자</label>
                         <input type="date" id="installDate" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                           >
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base">
                     </div>
+                    
+                    <!-- 고객명 + 고객 서명 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">고객명</label>
+                        <input type="text" id="customerName" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
+                            placeholder="고객 이름">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">고객 서명</label>
+                        <canvas id="customerSignature" 
+                            class="signature-canvas w-full" 
+                            width="600" height="120"></canvas>
+                        <button onclick="clearSignature('customer')" 
+                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
+                            <i class="fas fa-eraser mr-1"></i> 지우기
+                        </button>
+                    </div>
+                    
+                    <!-- 고객 전화번호 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">고객 전화번호</label>
+                        <input type="tel" id="customerPhone" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
+                            placeholder="010-1234-5678">
+                    </div>
+                    
+                    <!-- 차량 차대번호 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">차량 차대번호</label>
                         <input type="text" id="vehicleVin" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
                             placeholder="차대번호를 입력하세요">
                     </div>
+                    
+                    <!-- 주행거리 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">주행거리 (km)</label>
                         <input type="number" id="mileage" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
                             placeholder="주행거리를 입력하세요 (예: 50000)" 
                             min="0" 
-                            step="1" 
-                           >
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">제품 시공명 (해당 항목 체크)</label>
-                        
-                        <!-- 좌우 2단 레이아웃 -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- 기아PV5 -->
-                            <div class="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
-                                <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
-                                    <i class="fas fa-car mr-2"></i>
-                                    기아PV5
-                                </h3>
-                                <div class="space-y-2">
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 스마트패키지">
-                                        <span class="text-base">스마트패키지</span>
-                                    </label>
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 워크스테이션">
-                                        <span class="text-base">워크스테이션</span>
-                                    </label>
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 3단부품선반">
-                                        <span class="text-base">3단부품선반</span>
-                                    </label>
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 3단선반">
-                                        <span class="text-base">3단선반</span>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <!-- 밀워키PV5 -->
-                            <div class="border-2 border-red-200 rounded-lg p-4 bg-red-50">
-                                <h3 class="text-lg font-bold text-red-900 mb-3 flex items-center">
-                                    <i class="fas fa-tools mr-2"></i>
-                                    밀워키PV5
-                                </h3>
-                                <div class="space-y-2">
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 스마트에디션">
-                                        <span class="text-base">스마트에디션</span>
-                                    </label>
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 워크스테이션">
-                                        <span class="text-base">워크스테이션</span>
-                                    </label>
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 3단부품선반">
-                                        <span class="text-base">3단부품선반</span>
-                                    </label>
-                                    <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
-                                        <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 3단선반">
-                                        <span class="text-base">3단선반</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 기타 입력란 -->
-                        <div class="mt-4">
-                            <label class="flex items-center mb-2">
-                                <input type="checkbox" id="otherProductCheckbox" class="w-5 h-5 text-blue-600 mr-3">
-                                <span class="text-base font-medium text-gray-700">기타 (직접 입력)</span>
-                            </label>
-                            <input type="text" id="otherProductInput" 
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                                placeholder="기타 제품명을 입력하세요"
-                                disabled>
-                        </div>
+                            step="1">
                     </div>
                 </div>
             </div>
 
-            <!-- Checklist Sections -->
-            <div id="checklist-container"></div>
-
-            <!-- Warranty Certificate Section -->
-            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-8 mb-6 section-card border-4 border-blue-400">
-                <h2 class="text-3xl font-bold text-blue-900 mb-6 flex items-center justify-center">
+            <!-- 품질보증서 (메인 페이지 하단) -->
+            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-xl p-6 mb-6 section-card border-4 border-blue-400" style="max-width: 794px; margin: 0 auto;">
+                <h2 class="text-2xl font-bold text-blue-900 mb-4 flex items-center justify-center">
                     <i class="fas fa-certificate mr-3"></i>
                     품질보증서
                 </h2>
                 
-                <div class="bg-white rounded-lg p-6 shadow-inner">
-                    <div class="space-y-5 text-gray-800">
+                <div class="bg-white rounded-lg p-5 shadow-inner">
+                    <div class="space-y-3 text-gray-800">
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">1</span>
-                            <p class="text-xl leading-relaxed pt-1">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">1</span>
+                            <p class="text-base leading-relaxed">
                                 케이밴 제품의 보상 기준은 <strong class="text-blue-700">공정거래위원회 소비자 분쟁 해결 기준</strong>에 따릅니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">2</span>
-                            <p class="text-xl leading-relaxed pt-1">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">2</span>
+                            <p class="text-base leading-relaxed">
                                 본 제품은 <strong class="text-blue-700">엄격한 품질관리 및 검사 과정</strong>을 거쳐서 만들어진 제품입니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">3</span>
-                            <p class="text-xl leading-relaxed pt-1">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">3</span>
+                            <p class="text-base leading-relaxed">
                                 보증 기간 중 고객이 정상적으로 사용하는 과정에서 제품상의 결함으로 인해 발생한 고장의 경우, <strong class="text-blue-700">무상 수리</strong>를 제공합니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-lg mr-4 flex-shrink-0">4</span>
-                            <p class="text-xl leading-relaxed pt-1">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-sm mr-3 flex-shrink-0">4</span>
+                            <p class="text-base leading-relaxed">
                                 서비스를 받으실 때 <strong class="text-blue-700">본 보증서를 제시</strong>하여 주십시오.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white font-bold text-lg mr-4 flex-shrink-0">5</span>
-                            <p class="text-xl leading-relaxed pt-1">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold text-sm mr-3 flex-shrink-0">5</span>
+                            <p class="text-base leading-relaxed">
                                 본 제품의 보증 기간은 <strong class="text-green-700">3년 6만 킬로미터</strong>로 규정합니다.
                             </p>
                         </div>
                         
-                        <div class="mt-6 p-4 bg-red-50 rounded-lg border-2 border-red-300">
-                            <p class="text-lg font-bold text-red-800 mb-3">
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border-2 border-red-300">
+                            <p class="text-sm font-bold text-red-800 mb-2">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>
                                 다음의 경우는 품질 보증 조건에 해당되지 않으므로 유상 수리로 적용됩니다.
                             </p>
-                            <div class="space-y-2 text-base text-gray-700 ml-4">
+                            <div class="space-y-1 text-xs text-gray-700 ml-4">
                                 <p><strong>가.</strong> 소비자의 고의 또는 과실로 인하여 발생된 피해의 경우.</p>
                                 <p><strong>나.</strong> 당사의 서비스 기사가 아닌 자가 제품의 구조, 기능을 개조 또는 이동, 변조하여 발생된 고장.</p>
                                 <p><strong>다.</strong> 제품 사용 중 발생되는 생활 스크래치 및 변형, 변색.</p>
@@ -276,14 +232,14 @@ app.get('/', (c) => {
                         </div>
                     </div>
                     
-                    <div class="mt-8 pt-6 border-t-2 border-gray-200">
-                        <div class="flex justify-between items-center text-lg">
+                    <div class="mt-4 pt-4 border-t-2 border-gray-200">
+                        <div class="flex justify-between items-center text-sm">
                             <div class="text-gray-600">
-                                <i class="fas fa-phone-alt mr-2 text-blue-600"></i>
+                                <i class="fas fa-phone-alt mr-1 text-blue-600"></i>
                                 문의: <strong class="text-gray-800">031-666-1901</strong> / <strong class="text-gray-800">010-3271-1900</strong>
                             </div>
                             <div class="text-gray-600">
-                                <i class="fas fa-building mr-2 text-blue-600"></i>
+                                <i class="fas fa-building mr-1 text-blue-600"></i>
                                 <strong class="text-blue-900">(주)케이밴</strong>
                             </div>
                         </div>
@@ -291,69 +247,138 @@ app.get('/', (c) => {
                 </div>
             </div>
 
-            <!-- Signature Section -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card">
+            <!-- 시공자 정보 + 서명 -->
+            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
                 <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
-                    <i class="fas fa-signature mr-2"></i>
-                    서명란
+                    <i class="fas fa-user-tie mr-2"></i>
+                    시공자 정보
                 </h2>
-                
-                <!-- Installer Signature -->
-                <div class="mb-6">
-                    <h3 class="font-bold text-lg mb-2">시공자</h3>
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">시공자명</label>
                         <input type="text" id="installerName" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
                             placeholder="시공자 이름">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">서명</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">시공자 서명</label>
                         <canvas id="installerSignature" 
                             class="signature-canvas w-full" 
-                            width="600" height="200"></canvas>
+                            width="600" height="120"></canvas>
                         <button onclick="clearSignature('installer')" 
-                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                            <i class="fas fa-eraser mr-1"></i> 지우기
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Customer Signature -->
-                <div>
-                    <h3 class="font-bold text-lg mb-2">고객</h3>
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
-                        <input type="text" id="customerName" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="고객 이름">
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
-                        <input type="tel" id="customerPhone" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="010-1234-5678">
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
-                        <input type="email" id="customerEmail1" 
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
-                            placeholder="example@email.com">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">서명</label>
-                        <canvas id="customerSignature" 
-                            class="signature-canvas w-full" 
-                            width="600" height="200"></canvas>
-                        <button onclick="clearSignature('customer')" 
-                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
                             <i class="fas fa-eraser mr-1"></i> 지우기
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Notice -->
+            <!-- 이메일 입력 + 발송 버튼 -->
+            <div id="email-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
+                <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+                    <i class="fas fa-envelope mr-2"></i>
+                    이메일 발송
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">이메일 주소</label>
+                        <input type="email" id="customerEmail1" 
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
+                            placeholder="example@email.com">
+                    </div>
+                    <button id="emailBtn" onclick="submitEmail()" 
+                        class="w-full bg-blue-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        📧 이메일 발송
+                    </button>
+                </div>
+            </div>
+
+            <div style="page-break-after: always; margin: 40px 0; border-bottom: 3px dashed #ccc;"></div>
+
+            <!-- PAGE 2: 제품 선택 페이지 -->
+            <div id="product-page" class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card">
+                <h2 class="text-2xl font-bold text-blue-900 mb-4 flex items-center">
+                    <i class="fas fa-box-open mr-3"></i>
+                    제품 시공명 (해당 항목 체크)
+                </h2>
+                
+                <!-- 좌우 2단 레이아웃 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 기아PV5 -->
+                    <div class="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
+                        <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+                            <i class="fas fa-car mr-2"></i>
+                            기아PV5
+                        </h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 스마트패키지">
+                                <span class="text-base">스마트패키지</span>
+                            </label>
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 워크스테이션">
+                                <span class="text-base">워크스테이션</span>
+                            </label>
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 3단부품선반">
+                                <span class="text-base">3단부품선반</span>
+                            </label>
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-blue-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-blue-600 mr-3" value="기아PV5 3단선반">
+                                <span class="text-base">3단선반</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 밀워키PV5 -->
+                    <div class="border-2 border-red-200 rounded-lg p-4 bg-red-50">
+                        <h3 class="text-lg font-bold text-red-900 mb-3 flex items-center">
+                            <i class="fas fa-tools mr-2"></i>
+                            밀워키PV5
+                        </h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 스마트에디션">
+                                <span class="text-base">스마트에디션</span>
+                            </label>
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 워크스테이션">
+                                <span class="text-base">워크스테이션</span>
+                            </label>
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 3단부품선반">
+                                <span class="text-base">3단부품선반</span>
+                            </label>
+                            <label class="flex items-center p-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-red-50 transition">
+                                <input type="checkbox" class="product-checkbox w-5 h-5 text-red-600 mr-3" value="밀워키PV5 3단선반">
+                                <span class="text-base">3단선반</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 기타 입력란 -->
+                <div class="mt-4">
+                    <label class="flex items-center mb-2">
+                        <input type="checkbox" id="otherProductCheckbox" class="w-5 h-5 text-blue-600 mr-3">
+                        <span class="text-base font-medium text-gray-700">기타 (직접 입력)</span>
+                    </label>
+                    <input type="text" id="otherProductInput" 
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                        placeholder="기타 제품명을 입력하세요"
+                        disabled>
+                </div>
+            </div>
+
+            <div style="page-break-after: always; margin: 40px 0; border-bottom: 3px dashed #ccc;"></div>
+
+            <!-- PAGE 3: 체크리스트 섹션 -->
+            <div id="checklist-container"></div>
+
+
+
+            <!-- Notice + PNG Download Button -->
             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                 <p class="text-sm text-yellow-800">
                     <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -361,16 +386,8 @@ app.get('/', (c) => {
                 </p>
             </div>
 
-            <!-- Action Buttons -->
-            <div id="action-buttons" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <!-- Email Submit Button -->
-                <button id="emailBtn" onclick="submitEmail()" 
-                    class="w-full bg-blue-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
-                    <i class="fas fa-envelope mr-2"></i>
-                    📧 이메일 발송
-                </button>
-                
-                <!-- PNG Download Button -->
+            <!-- PNG Download Button -->
+            <div id="action-buttons" class="mb-6">
                 <button id="pngBtn" onclick="downloadJPG()" 
                     class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
                     <i class="fas fa-image mr-2"></i>
