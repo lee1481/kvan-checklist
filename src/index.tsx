@@ -281,17 +281,25 @@ app.get('/', (c) => {
                 </h2>
                 <!-- 시공자명 + 시공자 서명 (2단 레이아웃) -->
                 <div class="grid grid-cols-2 gap-4">
-                    <!-- 좌측: 시공자명 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">시공자명</label>
-                        <input type="text" id="installerName" 
-                            class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
-                            placeholder="시공자 이름">
+                    <!-- 좌측: 시공자(正) + 시공자(副) -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">시공자(正)</label>
+                            <input type="text" id="installerName" 
+                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                placeholder="정 시공자 이름">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">시공자(副)</label>
+                            <input type="text" id="subInstallerName" 
+                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                placeholder="부 시공자 이름 (선택)">
+                        </div>
                     </div>
                     
-                    <!-- 우측: 시공자 서명 -->
+                    <!-- 우측: 시공자(正) 서명만 -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">시공자 서명</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">시공자(正) 서명</label>
                         <canvas id="installerSignature" 
                             class="signature-canvas w-full" 
                             width="300" height="100"></canvas>
