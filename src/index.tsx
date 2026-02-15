@@ -146,32 +146,35 @@ app.get('/', (c) => {
                                 class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm">
                         </div>
                         
-                        <!-- 고객명 + 고객 전화번호 (2단) -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">고객명</label>
-                                <input type="text" id="customerName" 
-                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
-                                    placeholder="고객 이름">
+                        <!-- 고객 정보 + 고객 서명 (2단 레이아웃) -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- 좌측: 고객명 + 전화번호 -->
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">고객명</label>
+                                    <input type="text" id="customerName" 
+                                        class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                        placeholder="고객 이름">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">고객 전화번호</label>
+                                    <input type="tel" id="customerPhone" 
+                                        class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                                        placeholder="010-1234-5678">
+                                </div>
                             </div>
+                            
+                            <!-- 우측: 고객 서명 -->
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">고객 전화번호</label>
-                                <input type="tel" id="customerPhone" 
-                                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
-                                    placeholder="010-1234-5678">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">고객 서명</label>
+                                <canvas id="customerSignature" 
+                                    class="signature-canvas w-full" 
+                                    width="300" height="100"></canvas>
+                                <button onclick="clearSignature('customer')" 
+                                    class="mt-1 px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition">
+                                    <i class="fas fa-eraser mr-1"></i> 지우기
+                                </button>
                             </div>
-                        </div>
-                        
-                        <!-- 고객 서명 (전체 너비, 높이 축소) -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">고객 서명</label>
-                            <canvas id="customerSignature" 
-                                class="signature-canvas w-full" 
-                                width="600" height="80"></canvas>
-                            <button onclick="clearSignature('customer')" 
-                                class="mt-1 px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition">
-                                <i class="fas fa-eraser mr-1"></i> 지우기
-                            </button>
                         </div>
                         
                         <!-- 차대번호 + 주행거리 (2단) -->
@@ -195,55 +198,55 @@ app.get('/', (c) => {
                 </div>
 
             <!-- 품질보증서 -->
-            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg p-4 mb-3 section-card border-2 border-blue-400">
-                <h2 class="text-base font-bold text-blue-900 mb-2 flex items-center justify-center">
+            <div id="warranty-section" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg p-5 mb-3 section-card border-2 border-blue-400">
+                <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center justify-center">
                     <i class="fas fa-certificate mr-2"></i>
                     품질보증서
                 </h2>
                 
-                <div class="bg-white rounded-lg p-3 shadow-inner">
-                    <div class="space-y-1.5 text-gray-800">
+                <div class="bg-white rounded-lg p-4 shadow-inner">
+                    <div class="space-y-2 text-gray-800">
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">1</span>
-                            <p class="text-xs leading-tight">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">1</span>
+                            <p class="text-sm leading-relaxed">
                                 케이밴 제품의 보상 기준은 <strong class="text-blue-700">공정거래위원회 소비자 분쟁 해결 기준</strong>에 따릅니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">2</span>
-                            <p class="text-xs leading-tight">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">2</span>
+                            <p class="text-sm leading-relaxed">
                                 본 제품은 <strong class="text-blue-700">엄격한 품질관리 및 검사 과정</strong>을 거쳐서 만들어진 제품입니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">3</span>
-                            <p class="text-xs leading-tight">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">3</span>
+                            <p class="text-sm leading-relaxed">
                                 보증 기간 중 고객이 정상적으로 사용하는 과정에서 제품상의 결함으로 인해 발생한 고장의 경우, <strong class="text-blue-700">무상 수리</strong>를 제공합니다.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">4</span>
-                            <p class="text-xs leading-tight">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold text-xs mr-2 flex-shrink-0">4</span>
+                            <p class="text-sm leading-relaxed">
                                 서비스를 받으실 때 <strong class="text-blue-700">본 보증서를 제시</strong>하여 주십시오.
                             </p>
                         </div>
                         
                         <div class="flex items-start">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white font-bold text-xs mr-2 flex-shrink-0">5</span>
-                            <p class="text-xs leading-tight">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white font-bold text-xs mr-2 flex-shrink-0">5</span>
+                            <p class="text-sm leading-relaxed">
                                 본 제품의 보증 기간은 <strong class="text-green-700">3년 6만 킬로미터</strong>로 규정합니다.
                             </p>
                         </div>
                         
-                        <div class="mt-2 p-2 bg-red-50 rounded border border-red-300">
-                            <p class="text-xs font-bold text-red-800 mb-1">
+                        <div class="mt-3 p-3 bg-red-50 rounded border border-red-300">
+                            <p class="text-sm font-bold text-red-800 mb-1.5">
                                 <i class="fas fa-exclamation-triangle mr-1"></i>
                                 다음의 경우는 품질 보증 조건에 해당되지 않으므로 유상 수리로 적용됩니다.
                             </p>
-                            <div class="space-y-0.5 text-[10px] text-gray-700 ml-3">
+                            <div class="space-y-0.5 text-xs text-gray-700 ml-3">
                                 <p><strong>가.</strong> 소비자의 고의 또는 과실로 인하여 발생된 피해의 경우.</p>
                                 <p><strong>나.</strong> 당사의 서비스 기사가 아닌 자가 제품의 구조, 기능을 개조 또는 이동, 변조하여 발생된 고장.</p>
                                 <p><strong>다.</strong> 제품 사용 중 발생되는 생활 스크래치 및 변형, 변색.</p>
@@ -255,8 +258,8 @@ app.get('/', (c) => {
                         </div>
                     </div>
                     
-                    <div class="mt-2 pt-2 border-t border-gray-200">
-                        <div class="flex justify-between items-center text-[10px]">
+                    <div class="mt-3 pt-2 border-t border-gray-200">
+                        <div class="flex justify-between items-center text-xs">
                             <div class="text-gray-600">
                                 <i class="fas fa-phone-alt mr-1 text-blue-600"></i>
                                 문의: <strong class="text-gray-800">031-666-1901</strong> / <strong class="text-gray-800">010-3271-1900</strong>
@@ -271,23 +274,27 @@ app.get('/', (c) => {
             </div>
 
             <!-- 시공자 정보 + 서명 -->
-            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-4 mb-3 section-card">
-                <h2 class="text-base font-bold text-blue-900 mb-2 flex items-center">
+            <div id="installer-section" class="bg-white rounded-lg shadow-lg p-5 mb-3 section-card">
+                <h2 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
                     <i class="fas fa-user-tie mr-2"></i>
                     시공자 정보
                 </h2>
-                <div class="space-y-2">
+                <!-- 시공자명 + 시공자 서명 (2단 레이아웃) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- 좌측: 시공자명 -->
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">시공자명</label>
                         <input type="text" id="installerName" 
                             class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
                             placeholder="시공자 이름">
                     </div>
+                    
+                    <!-- 우측: 시공자 서명 -->
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">시공자 서명</label>
                         <canvas id="installerSignature" 
                             class="signature-canvas w-full" 
-                            width="600" height="80"></canvas>
+                            width="300" height="100"></canvas>
                         <button onclick="clearSignature('installer')" 
                             class="mt-1 px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition">
                             <i class="fas fa-eraser mr-1"></i> 지우기
