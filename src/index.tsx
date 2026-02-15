@@ -300,7 +300,7 @@ app.get('/', (c) => {
             <div id="email-section" class="bg-white rounded-lg shadow-lg p-4 mb-0 section-card">
                 <h2 class="text-base font-bold text-blue-900 mb-2 flex items-center">
                     <i class="fas fa-envelope mr-2"></i>
-                    이메일 발송 & JPG 다운로드
+                    이메일 발송
                 </h2>
                 <div class="space-y-2">
                     <div>
@@ -310,20 +310,12 @@ app.get('/', (c) => {
                             placeholder="example@email.com">
                     </div>
                     
-                    <!-- 버튼 2개: 이메일 발송 + JPG 다운로드 -->
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="emailBtn" onclick="submitEmail()" 
-                            class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
-                            <i class="fas fa-paper-plane mr-1"></i>
-                            📧 이메일 발송
-                        </button>
-                        
-                        <button id="jpgBtn" onclick="downloadPage1JPG()" 
-                            class="w-full bg-green-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
-                            <i class="fas fa-camera mr-1"></i>
-                            📸 JPG 다운로드
-                        </button>
-                    </div>
+                    <!-- 이메일 발송 버튼 (전체 너비) -->
+                    <button id="emailBtn" onclick="submitEmail()" 
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        📧 이메일 발송
+                    </button>
                 </div>
             </div>
             
@@ -422,20 +414,16 @@ app.get('/', (c) => {
                 </p>
             </div>
 
-            <!-- PNG Download Button -->
-            <div id="action-buttons" class="mb-6">
-                <button id="pngBtn" onclick="downloadJPG()" 
-                    class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
-                    <i class="fas fa-image mr-2"></i>
-                    🖼️ PNG 이미지 다운로드
-                </button>
+            <!-- Notice -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <p class="text-sm text-yellow-800">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>안내:</strong> 모든 항목을 확인하고 서명 후 이메일 발송 버튼을 눌러주세요.
+                </p>
             </div>
 
-            <!-- Loading Overlay -->
-            <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-8 text-center">
-                    <div class="spinner mx-auto mb-4"></div>
-                    <p class="text-lg font-medium">처리 중입니다...</p>
+
+                    <p class="text-lg font-medium">이메일 발송 중...</p>
                     <p class="text-sm text-gray-600 mt-2">잠시만 기다려주세요</p>
                 </div>
             </div>
@@ -1007,291 +995,6 @@ app.get('/', (c) => {
                     alert(errorMessage);
                 } finally {
                     document.getElementById('loadingOverlay').classList.add('hidden');
-                }
-            };
-
-
-            // 📸 Page 1 JPG 다운로드 (카카오톡 전송용)
-            window.downloadPage1JPG = async function() {
-                console.log('✅ downloadPage1JPG 함수 호출됨 (Page 1 전용)');
-                
-                // 필수 항목만 간단히 체크
-                const installDate = document.getElementById('installDate').value;
-                const vehicleVin = document.getElementById('vehicleVin').value;
-                const customerName = document.getElementById('customerName').value;
-                const installerName = document.getElementById('installerName').value;
-                
-                if (!installDate || !vehicleVin || !customerName || !installerName) {
-                    alert('시공일자, 차대번호, 고객명, 시공자명을 모두 입력해주세요.');
-                    return;
-                }
-                
-                try {
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    loadingOverlay.classList.remove('hidden');
-                    
-                    // Page 1 A4 컨테이너 선택
-                    const page1Container = document.getElementById('page1-container');
-                    
-                    if (!page1Container) {
-                        throw new Error('Page 1 영역을 찾을 수 없습니다.');
-                    }
-                    
-                    // 스크롤 최상단
-                    window.scrollTo(0, 0);
-                    
-                    // 폰트 로딩 대기
-                    if (document.fonts && document.fonts.ready) {
-                        await document.fonts.ready;
-                    }
-                    
-                    // DOM 렌더링 대기
-                    await new Promise(resolve => setTimeout(resolve, 800));
-                    
-                    // html2canvas로 고품질 JPG 캡처 (A4 비율)
-                    const canvas = await html2canvas(page1Container, {
-                        scale: 3, // 고품질 (카카오톡용)
-                        useCORS: true,
-                        allowTaint: false,
-                        backgroundColor: '#ffffff',
-                        logging: true,
-                        imageTimeout: 15000,
-                        removeContainer: false,
-                        width: 794,
-                        height: 1123
-                    });
-                    
-                    // Canvas를 JPG로 변환 (95% 품질)
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-                    
-                    // 파일명 생성
-                    const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.jpg';
-                    
-                    // 다운로드 링크 생성
-                    const link = document.createElement('a');
-                    link.href = dataUrl;
-                    link.download = fileName;
-                    link.click();
-                    
-                    console.log('✅ JPG 다운로드 완료!', fileName);
-                    
-                    loadingOverlay.classList.add('hidden');
-                    alert('JPG 파일이 다운로드되었습니다!\\n파일명: ' + fileName + '\\n\\n카카오톡으로 고객에게 전송해주세요.');
-                    
-                } catch (error) {
-                    console.error('❌ JPG 생성 실패:', error);
-                    alert('JPG 생성에 실패했습니다: ' + error.message);
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.classList.add('hidden');
-                    }
-                }
-            };
-
-
-            // 📄 JPG 다운로드 버튼
-            window.downloadJPG = async function() {
-                console.log('✅ downloadJPG 함수 호출됨');
-                const formData = window.validateForm();
-                if (!formData) {
-                    console.log('❌ validateForm 실패');
-                    return;
-                }
-                console.log('✅ validateForm 통과, JPG 생성 시작');
-                
-                try {
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    loadingOverlay.classList.remove('hidden');
-                    
-                    // 메인 콘텐츠 영역 캡처
-                    const container = document.getElementById('app');
-                    const buttons = document.getElementById('action-buttons');
-                    const loadingDiv = document.getElementById('loadingOverlay');
-                    
-                    if (!container) {
-                        throw new Error('콘텐츠 영역을 찾을 수 없습니다.');
-                    }
-                    
-                    // 스크롤을 최상단으로 이동
-                    window.scrollTo(0, 0);
-                    
-                    // 버튼과 로딩 오버레이 숨기기
-                    if (buttons) buttons.style.display = 'none';
-                    if (loadingDiv) loadingDiv.style.display = 'none';
-                    
-                    // A4 사이즈에 맞게 스타일 조정하되, 콘텐츠 크기는 자연스럽게 유지
-                    const originalStyles = {
-                        maxWidth: container.style.maxWidth,
-                        padding: container.style.padding,
-                        fontSize: document.body.style.fontSize,
-                        width: container.style.width
-                    };
-                    
-                    // 컨테이너를 A4 너비에 맞게 조정 (자연스러운 높이 유지)
-                    container.style.maxWidth = '800px';
-                    container.style.width = '800px';
-                    container.style.padding = '30px';
-                    
-                    // 모든 섹션의 패딩과 마진을 적당히 축소
-                    const sections = container.querySelectorAll('.section-card, .bg-white');
-                    const sectionOriginalStyles = [];
-                    sections.forEach(section => {
-                        sectionOriginalStyles.push({
-                            element: section,
-                            padding: section.style.padding,
-                            margin: section.style.marginBottom
-                        });
-                        section.style.padding = '16px';
-                        section.style.marginBottom = '16px';
-                    });
-                    
-                    // 제목 폰트 크기를 약간만 축소
-                    const headings = container.querySelectorAll('h1, h2, h3, h4');
-                    const headingOriginalStyles = [];
-                    headings.forEach(heading => {
-                        headingOriginalStyles.push({
-                            element: heading,
-                            fontSize: heading.style.fontSize,
-                            marginBottom: heading.style.marginBottom
-                        });
-                        const currentSize = window.getComputedStyle(heading).fontSize;
-                        heading.style.fontSize = (parseFloat(currentSize) * 0.85) + 'px';
-                        heading.style.marginBottom = '10px';
-                    });
-                    
-                    // 입력란과 텍스트를 읽기 좋은 크기로 유지
-                    const inputs = container.querySelectorAll('input, label, p, span');
-                    const inputOriginalStyles = [];
-                    inputs.forEach(input => {
-                        inputOriginalStyles.push({
-                            element: input,
-                            fontSize: input.style.fontSize,
-                            padding: input.style.padding
-                        });
-                        const currentSize = window.getComputedStyle(input).fontSize;
-                        if (parseFloat(currentSize) > 14) {
-                            input.style.fontSize = '13px';
-                        }
-                        if (input.tagName === 'INPUT') {
-                            input.style.padding = '8px 10px';
-                        }
-                    });
-                    
-                    // 서명 캔버스 크기를 적당히 축소
-                    const signatures = container.querySelectorAll('canvas');
-                    const signatureOriginalStyles = [];
-                    signatures.forEach(sig => {
-                        signatureOriginalStyles.push({
-                            element: sig,
-                            height: sig.style.height
-                        });
-                        sig.style.height = '120px';
-                    });
-                    
-                    // 모든 요소의 가시성 강제 적용
-                    const allElements = container.querySelectorAll('*');
-                    allElements.forEach(el => {
-                        const computed = window.getComputedStyle(el);
-                        if (computed.visibility === 'hidden' && !el.classList.contains('hidden')) {
-                            el.style.visibility = 'visible';
-                        }
-                        if (computed.opacity === '0' && !el.classList.contains('hidden')) {
-                            el.style.opacity = '1';
-                        }
-                    });
-                    
-                    // 폰트 로딩 대기
-                    if (document.fonts && document.fonts.ready) {
-                        await document.fonts.ready;
-                    }
-                    
-                    // DOM 렌더링 완료 대기 (1초)
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    // 이미지 로딩 완료 대기
-                    const images = container.querySelectorAll('img');
-                    await Promise.all(
-                        Array.from(images).map(img => {
-                            if (img.complete) return Promise.resolve();
-                            return new Promise(resolve => {
-                                img.onload = resolve;
-                                img.onerror = resolve;
-                                setTimeout(resolve, 3000); // 3초 타임아웃
-                            });
-                        })
-                    );
-                    
-                    // html2canvas로 고품질 캡처 (자연스러운 콘텐츠 크기)
-                    const canvas = await html2canvas(container, {
-                        scale: 2.5, // 높은 해상도 유지
-                        useCORS: true,
-                        allowTaint: false,
-                        backgroundColor: '#ffffff',
-                        logging: true,
-                        imageTimeout: 15000,
-                        removeContainer: true
-                        // width/height를 지정하지 않아 자연스러운 크기 유지
-                    });
-                    
-                    // 원래 스타일로 복원
-                    container.style.maxWidth = originalStyles.maxWidth;
-                    container.style.width = originalStyles.width;
-                    container.style.padding = originalStyles.padding;
-                    
-                    sectionOriginalStyles.forEach(style => {
-                        style.element.style.padding = style.padding;
-                        style.element.style.marginBottom = style.margin;
-                    });
-                    
-                    headingOriginalStyles.forEach(style => {
-                        style.element.style.fontSize = style.fontSize;
-                        style.element.style.marginBottom = style.marginBottom;
-                    });
-                    
-                    inputOriginalStyles.forEach(style => {
-                        style.element.style.fontSize = style.fontSize;
-                        style.element.style.padding = style.padding;
-                    });
-                    
-                    signatureOriginalStyles.forEach(style => {
-                        style.element.style.height = style.height;
-                    });
-                    
-                    // 버튼과 로딩 오버레이 다시 표시
-                    if (buttons) buttons.style.display = '';
-                    if (loadingDiv) {
-                        loadingDiv.style.display = '';
-                        loadingDiv.classList.add('hidden');
-                    }
-                    
-                    // Canvas를 PNG로 변환 (무손실, 100% 품질)
-                    const imageData = canvas.toDataURL('image/png');
-                    
-                    // 파일명 생성
-                    const vehicleVin = document.getElementById('vehicleVin').value || '차량';
-                    const installDate = document.getElementById('installDate').value || new Date().toISOString().split('T')[0];
-                    const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.png';
-                    
-                    // 다운로드
-                    const link = document.createElement('a');
-                    link.href = imageData;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    console.log('✅ PNG 다운로드 완료!');
-                    
-                } catch (error) {
-                    console.error('❌ PNG 생성 오류:', error);
-                    alert('PNG 생성 중 오류가 발생했습니다: ' + error.message);
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.style.display = '';
-                        loadingOverlay.classList.add('hidden');
-                    }
-                    const buttons = document.getElementById('action-buttons');
-                    if (buttons) buttons.style.display = '';
                 }
             };
 
