@@ -277,7 +277,7 @@ app.get('/', (c) => {
             <div id="email-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 section-card" style="max-width: 794px; margin: 0 auto;">
                 <h2 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
                     <i class="fas fa-envelope mr-2"></i>
-                    이메일 발송
+                    이메일 발송 & JPG 다운로드
                 </h2>
                 <div class="space-y-4">
                     <div>
@@ -286,11 +286,21 @@ app.get('/', (c) => {
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-base"
                             placeholder="example@email.com">
                     </div>
-                    <button id="emailBtn" onclick="submitEmail()" 
-                        class="w-full bg-blue-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
-                        <i class="fas fa-paper-plane mr-2"></i>
-                        📧 이메일 발송
-                    </button>
+                    
+                    <!-- 버튼 2개: 이메일 발송 + JPG 다운로드 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button id="emailBtn" onclick="submitEmail()" 
+                            class="w-full bg-blue-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            📧 이메일 발송
+                        </button>
+                        
+                        <button id="jpgBtn" onclick="downloadPage1JPG()" 
+                            class="w-full bg-green-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-green-700 transition shadow-lg flex items-center justify-center">
+                            <i class="fas fa-camera mr-2"></i>
+                            📸 JPG 다운로드
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -971,6 +981,95 @@ app.get('/', (c) => {
                     alert(errorMessage);
                 } finally {
                     document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            };
+
+
+            // 📸 Page 1 JPG 다운로드 (카카오톡 전송용)
+            window.downloadPage1JPG = async function() {
+                console.log('✅ downloadPage1JPG 함수 호출됨 (Page 1 전용)');
+                
+                // 필수 항목만 간단히 체크
+                const installDate = document.getElementById('installDate').value;
+                const vehicleVin = document.getElementById('vehicleVin').value;
+                const customerName = document.getElementById('customerName').value;
+                const installerName = document.getElementById('installerName').value;
+                
+                if (!installDate || !vehicleVin || !customerName || !installerName) {
+                    alert('시공일자, 차대번호, 고객명, 시공자명을 모두 입력해주세요.');
+                    return;
+                }
+                
+                try {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.classList.remove('hidden');
+                    
+                    // Page 1 영역만 선택 (main-page, warranty-section, installer-section)
+                    const mainPage = document.getElementById('main-page');
+                    const warrantySection = document.getElementById('warranty-section');
+                    const installerSection = document.getElementById('installer-section');
+                    
+                    if (!mainPage || !warrantySection || !installerSection) {
+                        throw new Error('Page 1 영역을 찾을 수 없습니다.');
+                    }
+                    
+                    // 임시 컨테이너 생성하여 Page 1 내용만 담기
+                    const tempContainer = document.createElement('div');
+                    tempContainer.style.cssText = 'position: absolute; left: -9999px; top: 0; background: #f3f4f6; padding: 20px;';
+                    tempContainer.appendChild(mainPage.cloneNode(true));
+                    tempContainer.appendChild(warrantySection.cloneNode(true));
+                    tempContainer.appendChild(installerSection.cloneNode(true));
+                    document.body.appendChild(tempContainer);
+                    
+                    // 스크롤 최상단
+                    window.scrollTo(0, 0);
+                    
+                    // 폰트 로딩 대기
+                    if (document.fonts && document.fonts.ready) {
+                        await document.fonts.ready;
+                    }
+                    
+                    // DOM 렌더링 대기
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // html2canvas로 고품질 JPG 캡처
+                    const canvas = await html2canvas(tempContainer, {
+                        scale: 3, // 고품질 (카카오톡용)
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: '#f3f4f6',
+                        logging: true,
+                        imageTimeout: 15000,
+                        removeContainer: false
+                    });
+                    
+                    // 임시 컨테이너 제거
+                    document.body.removeChild(tempContainer);
+                    
+                    // Canvas를 JPG로 변환 (95% 품질)
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                    
+                    // 파일명 생성
+                    const fileName = '케이밴_점검표_' + vehicleVin + '_' + installDate + '.jpg';
+                    
+                    // 다운로드 링크 생성
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = fileName;
+                    link.click();
+                    
+                    console.log('✅ JPG 다운로드 완료!', fileName);
+                    
+                    loadingOverlay.classList.add('hidden');
+                    alert('JPG 파일이 다운로드되었습니다!\\n파일명: ' + fileName + '\\n\\n카카오톡으로 고객에게 전송해주세요.');
+                    
+                } catch (error) {
+                    console.error('❌ JPG 생성 실패:', error);
+                    alert('JPG 생성에 실패했습니다: ' + error.message);
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.add('hidden');
+                    }
                 }
             };
 
